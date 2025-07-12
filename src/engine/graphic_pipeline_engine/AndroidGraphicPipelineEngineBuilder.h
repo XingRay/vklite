@@ -24,4 +24,4 @@ namespace vklite {
 
 } // vklite
 
-#ifdef VKLITE_ANDROID
+#endif

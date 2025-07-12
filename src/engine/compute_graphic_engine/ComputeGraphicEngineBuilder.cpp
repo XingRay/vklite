@@ -223,7 +223,7 @@ namespace vklite {
                 .buildUnique();
 
         Framebuffers framebuffers = FramebuffersBuilder()
-                .count(struct stat<uint32_t>(displayImageViews.size()))
+                .count(static_cast<uint32_t>(displayImageViews.size()))
                 .framebufferBuilder([&](uint32_t index) {
                     return FramebufferBuilder()
                             .device(device->getVkDevice())
