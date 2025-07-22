@@ -1,5 +1,5 @@
 # Linux平台配置
-message(STATUS "platform: linux")
+message("platform: linux")
 target_compile_definitions(${PROJECT_NAME} PRIVATE VKLITE_LINUX)
 
 find_package(Vulkan REQUIRED)

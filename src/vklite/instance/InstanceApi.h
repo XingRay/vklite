@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include <vulkan/vulkan.hpp>
 
 #ifdef VKLITE_ANDROID

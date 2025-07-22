@@ -6,7 +6,7 @@
 
 #ifdef VKLITE_ANDROID
 
-#include "engine/compute_graphic_engine/ComputeGraphicEngineBuilder.h"
+#include "vklite_engine/compute_graphic_engine/ComputeGraphicEngineBuilder.h"
 
 namespace vklite {
 

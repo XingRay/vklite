@@ -10,7 +10,7 @@
 
 #include "vklite/vklite.h"
 
-#include "engine/compute_graphic_engine/ComputeGraphicEngine.h"
+#include "vklite_engine/compute_graphic_engine/ComputeGraphicEngine.h"
 
 namespace vklite {
 

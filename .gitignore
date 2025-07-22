@@ -2,6 +2,8 @@ build
 build_windows
 build_android
 
+dist
+
 cmake-build-debug
 cmake-build-release
 

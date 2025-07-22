@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "engine/device_engine/DeviceEngineBuilder.h"
+#include "vklite_engine/device_engine/DeviceEngineBuilder.h"
 
 namespace vklite {
 

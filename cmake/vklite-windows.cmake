@@ -1,40 +1,66 @@
 # Windows 平台 Vulkan SDK 配置
 
-message(STATUS "platform: windows")
-target_compile_definitions(${PROJECT_NAME} PRIVATE VKLITE_WINDOWS)
+function(import_vulkan)
 
-if(NOT DEFINED ENV{VULKAN_SDK})
-    message(FATAL_ERROR "VULKAN_SDK environment variable not set!")
-endif()
+    set(Vulkan_sdk_dir "")
 
-set(VULKAN_INCLUDE_DIR "$ENV{VULKAN_SDK}/Include")
-set(VULKAN_LIBRARY "$ENV{VULKAN_SDK}/Lib/vulkan-1.lib")
+    if (IS_DIRECTORY ${VULKAN_SDK_PATH})
+        set(Vulkan_sdk_dir ${VULKAN_SDK_PATH})
+    endif ()
 
-# glfw
-set(GLFW_INSTALL_DIR D:/develop/opengl/glfw/glfw-3.4.bin.WIN64)
-set(GLFW_LIB_DIR ${GLFW_INSTALL_DIR}/lib-vc2022)
-set(GLFW_INCLUDE_DIR ${GLFW_INSTALL_DIR}/include)
+    if (NOT IS_DIRECTORY ${Vulkan_sdk_dir})
+        message(FATAL_ERROR "Vulkan_sdk_dir:${Vulkan_sdk_dir} is not dir")
+    endif ()
+    message("Vulkan_sdk_dir:${Vulkan_sdk_dir}")
+
+    # 创建vulkan 导入库
+    add_library(Vulkan STATIC IMPORTED)
+
+    message("vulkan include dir: ${Vulkan_sdk_dir}/Include")
+    # 引入头文件方式 1
+    target_include_directories(
+            Vulkan
+            INTERFACE ${Vulkan_sdk_dir}/Include
+    )
+
+    set_target_properties(Vulkan PROPERTIES
+            IMPORTED_LOCATION "${Vulkan_sdk_dir}/Lib/vulkan-1.lib"
+    )
+
+endfunction()
+
+
+function(import_glfw)
+    set(glfw_dir "")
+
+    if (IS_DIRECTORY ${glfw_PATH})
+        set(glfw_dir ${glfw_PATH})
+    endif ()
+
+    if (NOT IS_DIRECTORY ${glfw_dir})
+        message(FATAL_ERROR "glfw_dir:${glfw_dir} is not dir")
+    endif ()
+    message("glfw_dir:${glfw_dir}")
+
+    set(GLFW_LIB_DIR ${glfw_dir}/lib-vc2022)
+    set(GLFW_INCLUDE_DIR ${glfw_dir}/include)
+
+    add_library(glfw STATIC IMPORTED)
+
+    set_target_properties(glfw PROPERTIES
+            IMPORTED_LOCATION "${GLFW_LIB_DIR}/glfw3.lib"
+    )
+
+    target_include_directories(glfw
+            INTERFACE ${GLFW_INCLUDE_DIR}
+    )
+
+endfunction()
 
 
 function(configure_windows_target target)
-    target_include_directories(${target} PRIVATE
-            # Vulkan
-            ${VULKAN_INCLUDE_DIR}
-
-            # GLFW
-            ${GLFW_INCLUDE_DIR}
+    message("platform: windows")
+    target_compile_definitions(${target}
+            PUBLIC VKLITE_WINDOWS
     )
-
-    target_link_libraries(${target} PRIVATE
-            # Vulkan
-            ${VULKAN_LIBRARY}
-
-            # GLFW
-            ${GLFW_LIB_DIR}/glfw3.lib
-    )
-
-    # Windows 特定编译选项
-    if(MSVC)
-        target_compile_options(${target} PRIVATE /W4 /WX)
-    endif()
 endfunction()

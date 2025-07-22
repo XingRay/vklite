@@ -9,10 +9,9 @@
 #include <functional>
 
 #include "vklite/vklite.h"
-#include "engine/device_engine/DeviceEngine.h"
+#include "vklite_engine/device_engine/DeviceEngine.h"
 
 namespace vklite {
-
     class DeviceEngineBuilder {
     private:
         uint32_t mFrameCount = 2;
@@ -23,9 +22,9 @@ namespace vklite {
         ShaderConfigure mGraphicShaderConfigure;
 
         InstanceBuilder mInstanceBuilder;
-        std::function<std::unique_ptr<Surface>(const Instance &Instance)> mSurfaceBuilder;
-        std::function<std::unique_ptr<PhysicalDevice>(const Instance &Instance, const Surface &surface)> mPhysicalDeviceSelector;
-        std::function<vk::SampleCountFlagBits(const std::vector<vk::SampleCountFlagBits> &sampleCountFlagBits)> mSampleCountSelector;
+        std::function<std::unique_ptr<Surface>(const Instance & Instance)> mSurfaceBuilder;
+        std::function<std::unique_ptr<PhysicalDevice>(const Instance & Instance, const Surface & surface)> mPhysicalDeviceSelector;
+        std::function<vk::SampleCountFlagBits(const std::vector<vk::SampleCountFlagBits> & sampleCountFlagBits)> mSampleCountSelector;
         DeviceBuilder mDeviceBuilder;
 
     public:
@@ -55,11 +54,11 @@ namespace vklite {
 
         DeviceEngineBuilder &addDevicePlugin(std::unique_ptr<PluginInterface> plugin);
 
-        DeviceEngineBuilder &surfaceBuilder(std::function<std::unique_ptr<Surface>(const Instance &Instance)> &&surfaceBuilder);
+        DeviceEngineBuilder &surfaceBuilder(std::function<std::unique_ptr<Surface>(const Instance & Instance)> &&surfaceBuilder);
 
-        DeviceEngineBuilder &physicalDeviceSelector(std::function<std::unique_ptr<PhysicalDevice>(const Instance &Instance, const Surface &surface)> &&physicalDeviceSelector);
+        DeviceEngineBuilder &physicalDeviceSelector(std::function<std::unique_ptr<PhysicalDevice>(const Instance & Instance, const Surface & surface)> &&physicalDeviceSelector);
 
-        DeviceEngineBuilder &sampleCountSelector(std::function<vk::SampleCountFlagBits(const std::vector<vk::SampleCountFlagBits> &sampleCountFlagBits)> &&sampleCountSelector);
+        DeviceEngineBuilder &sampleCountSelector(std::function<vk::SampleCountFlagBits(const std::vector<vk::SampleCountFlagBits> & sampleCountFlagBits)> &&sampleCountSelector);
 
         DeviceEngineBuilder &enableDepthTest();
 
@@ -76,7 +75,5 @@ namespace vklite {
          * preset
          */
         DeviceEngineBuilder &asDefault();
-
     };
-
 } // vklite

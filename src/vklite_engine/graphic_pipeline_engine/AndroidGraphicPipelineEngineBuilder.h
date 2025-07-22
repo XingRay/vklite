@@ -6,7 +6,7 @@
 
 #ifdef VKLITE_ANDROID
 
-#include "engine/graphic_pipeline_engine/GraphicPipelineEngineBuilder.h"
+#include "vklite_engine/graphic_pipeline_engine/GraphicPipelineEngineBuilder.h"
 
 namespace vklite {
 
