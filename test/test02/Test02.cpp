@@ -2,21 +2,21 @@
 // Created by leixing on 2025-07-12.
 //
 
-#include "test01.h"
+#include "Test02.h"
 #include "FileUtil.h"
 #include "vklite_engine/graphic_pipeline_engine/WindowsGraphicPipelineEngineBuilder.h"
 
 namespace test {
-    Test01::Test01() {
+    Test02::Test02() {
         LOG_D("Test01::Test01()");
     }
 
-    Test01::~Test01() = default;
+    Test02::~Test02() = default;
 
-    void Test01::init(GLFWwindow *window, int32_t width, int32_t height) {
+    void Test02::init(GLFWwindow *window, int32_t width, int32_t height) {
         LOG_D("Test01::init: window:%p, width:%d, height:%d", window, width, height);
-        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("spv/01_triangle.vert.spv");
-        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("spv/01_triangle.frag.spv");
+        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("D:/code/git/github/vklite/test/spv/01_triangle.vert.spv");
+        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("D:/code/git/github/vklite/test/spv/01_triangle.frag.spv");
         LOG_D("vertexShaderCode.size:%zd, fragmentShaderCode.size:%zd", vertexShaderCode.size(), fragmentShaderCode.size());
 
         vklite::ShaderConfigure shaderConfigure = vklite::ShaderConfigure()
@@ -60,13 +60,13 @@ namespace test {
         mEngine->addVertexBuffer(*mVertexBuffer);
     }
 
-    void Test01::drawFrame() {
+    void Test02::drawFrame() {
         mEngine->drawIndexed();
     }
 
-    void Test01::cleanup() {
+    void Test02::cleanup() {
     }
 
-    void Test01::onWindowResized(int32_t width, int32_t height) {
+    void Test02::onWindowResized(int32_t width, int32_t height) {
     }
 } // test01
