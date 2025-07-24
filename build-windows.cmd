@@ -1,7 +1,6 @@
-mkdir build_windows && cd build_windows
 
-cmake -G "Visual Studio 17 2022" -A x64 ..
+cmake -S . -B build -G "Visual Studio 17 2022" -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=build/dist
 
-cmake --build . --config Release
+cmake --build ./build --config Release
 
-cmake --install . --prefix dist/windows
+cmake --install ./build --config Release

@@ -26,16 +26,3 @@ function(import_vulkan_header)
             INTERFACE "${VulkanHeadersPath}/include"
     )
 endfunction()
-
-function(configure_android_target target)
-    import_vulkan_header()
-
-    target_link_libraries(${PROJECT_NAME} PUBLIC
-            android
-            log
-            vulkan
-            VulkanHeaders
-    )
-
-
-endfunction()

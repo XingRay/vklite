@@ -5,6 +5,7 @@ project(vklite
 )
 
 option(BUILD_TEST "build test" ON)
+option(BUILD_ENGINE "build engine" ON)
 
 set(VULKAN_SDK_PATH "D:/develop/vulkan/VulkanSDK/1.3.296.0" CACHE STRING "vulkan sdk path")
 set(glfw_PATH "D:/develop/opengl/glfw/glfw-3.4.bin.WIN64" CACHE STRING "glfw path")
@@ -42,3 +43,4 @@ if (BUILD_TEST)
 else ()
     message("Skipping test build")
 endif ()
+
