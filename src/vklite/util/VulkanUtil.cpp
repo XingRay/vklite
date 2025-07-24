@@ -9,18 +9,17 @@
 #include "vklite/Log.h"
 
 namespace vklite {
-
-//    void VulkanUtil::recordCopyBufferCommand(const vk::CommandBuffer &commandBuffer,
-//                                             const vk::Buffer &srcBuffer,
-//                                             const vk::Buffer &dstBuffer,
-//                                             vk::DeviceSize size) {
-//        vk::BufferCopy bufferCopy;
-//        bufferCopy.setSrcOffset(0)
-//                .setDstOffset(0)
-//                .setSize(size);
-//
-//        commandBuffer.copyBuffer(srcBuffer, dstBuffer, bufferCopy);
-//    }
+    //    void VulkanUtil::recordCopyBufferCommand(const vk::CommandBuffer &commandBuffer,
+    //                                             const vk::Buffer &srcBuffer,
+    //                                             const vk::Buffer &dstBuffer,
+    //                                             vk::DeviceSize size) {
+    //        vk::BufferCopy bufferCopy;
+    //        bufferCopy.setSrcOffset(0)
+    //                .setDstOffset(0)
+    //                .setSize(size);
+    //
+    //        commandBuffer.copyBuffer(srcBuffer, dstBuffer, bufferCopy);
+    //    }
 
     // 转换 SampleCountFlags 为字符串
     std::string VulkanUtil::sampleCountFlagsToString(vk::SampleCountFlags flags) {
@@ -79,7 +78,6 @@ namespace vklite {
                                                         uint32_t mipLevels,
                                                         uint32_t srcQueueFamilyIndex,
                                                         uint32_t dstQueueFamilyIndex) {
-
         vk::ImageSubresourceRange imageSubresourceRange;
         imageSubresourceRange
                 .setBaseMipLevel(0)
@@ -144,14 +142,12 @@ namespace vklite {
         commandBuffer.pipelineBarrier(sourceStage,
                                       destinationStage,
                                       vk::DependencyFlags{},
-                // 内存屏障
+                                      // 内存屏障
                                       {},
-                // 缓冲区内存屏障
+                                      // 缓冲区内存屏障
                                       {},
-                // 图像内存屏障
+                                      // 图像内存屏障
                                       {imageMemoryBarrier});
-
-
     }
 
     bool VulkanUtil::hasStencilComponent(vk::Format format) {
@@ -181,7 +177,6 @@ namespace vklite {
 
     uint32_t VulkanUtil::sampleCountFlagBitsToUint32(vk::SampleCountFlagBits sampleCount) {
         switch (sampleCount) {
-
             case vk::SampleCountFlagBits::e1:
                 return 1;
             case vk::SampleCountFlagBits::e2:
@@ -217,7 +212,7 @@ namespace vklite {
             case vk::Format::eS8Uint:
                 return 1;
 
-                // 16-bit formats (2 bytes per component)
+            // 16-bit formats (2 bytes per component)
             case vk::Format::eR4G4B4A4UnormPack16:
             case vk::Format::eB4G4R4A4UnormPack16:
             case vk::Format::eR5G6B5UnormPack16:
@@ -242,7 +237,7 @@ namespace vklite {
             case vk::Format::eD16Unorm:
                 return 2;
 
-                // 24-bit formats (3 bytes per component)
+            // 24-bit formats (3 bytes per component)
             case vk::Format::eR8G8B8Unorm:
             case vk::Format::eR8G8B8Snorm:
             case vk::Format::eR8G8B8Uscaled:
@@ -259,7 +254,7 @@ namespace vklite {
             case vk::Format::eB8G8R8Srgb:
                 return 3;
 
-                // 32-bit formats (4 bytes per component)
+            // 32-bit formats (4 bytes per component)
             case vk::Format::eR8G8B8A8Unorm:
             case vk::Format::eR8G8B8A8Snorm:
             case vk::Format::eR8G8B8A8Uscaled:
@@ -309,7 +304,7 @@ namespace vklite {
             case vk::Format::eD32SfloatS8Uint:
                 return 4;
 
-                // 48-bit formats (6 bytes per component)
+            // 48-bit formats (6 bytes per component)
             case vk::Format::eR16G16B16Unorm:
             case vk::Format::eR16G16B16Snorm:
             case vk::Format::eR16G16B16Uscaled:
@@ -319,7 +314,7 @@ namespace vklite {
             case vk::Format::eR16G16B16Sfloat:
                 return 6;
 
-                // 64-bit formats (8 bytes per component)
+            // 64-bit formats (8 bytes per component)
             case vk::Format::eR16G16B16A16Unorm:
             case vk::Format::eR16G16B16A16Snorm:
             case vk::Format::eR16G16B16A16Uscaled:
@@ -335,13 +330,13 @@ namespace vklite {
             case vk::Format::eR64Sfloat:
                 return 8;
 
-                // 96-bit formats (12 bytes per component)
+            // 96-bit formats (12 bytes per component)
             case vk::Format::eR32G32B32Uint:
             case vk::Format::eR32G32B32Sint:
             case vk::Format::eR32G32B32Sfloat:
                 return 12;
 
-                // 128-bit formats (16 bytes per component)
+            // 128-bit formats (16 bytes per component)
             case vk::Format::eR32G32B32A32Uint:
             case vk::Format::eR32G32B32A32Sint:
             case vk::Format::eR32G32B32A32Sfloat:
@@ -356,7 +351,7 @@ namespace vklite {
             case vk::Format::eR64G64B64A64Sfloat:
                 return 16;
 
-                // Compressed formats (block-based, size depends on block dimensions)
+            // Compressed formats (block-based, size depends on block dimensions)
             case vk::Format::eBc1RgbUnormBlock:
             case vk::Format::eBc1RgbSrgbBlock:
             case vk::Format::eBc1RgbaUnormBlock:
@@ -421,7 +416,7 @@ namespace vklite {
             case vk::Format::ePvrtc24BppSrgbBlockIMG:
                 throw std::runtime_error("Compressed formats are not supported for size calculation");
 
-                // Other formats (e.g., multi-plane or special formats)
+            // Other formats (e.g., multi-plane or special formats)
             case vk::Format::eG8B8G8R8422Unorm:
             case vk::Format::eB8G8R8G8422Unorm:
             case vk::Format::eG8B8R83Plane420Unorm:
@@ -438,7 +433,7 @@ namespace vklite {
             case vk::Format::eG16B16R163Plane444Unorm:
                 throw std::runtime_error("Multi-plane or special formats are not supported for size calculation");
 
-                // Undefined format
+            // Undefined format
             case vk::Format::eUndefined:
                 throw std::runtime_error("Undefined format has no size");
 
@@ -464,8 +459,8 @@ namespace vklite {
         }
 
         return vk::Extent2D{
-                std::clamp(width, capability.minImageExtent.width, capability.maxImageExtent.width),
-                std::clamp(height, capability.minImageExtent.height, capability.maxImageExtent.height),
+            std::clamp(width, capability.minImageExtent.width, capability.maxImageExtent.width),
+            std::clamp(height, capability.minImageExtent.height, capability.maxImageExtent.height),
         };
     }
 
@@ -475,9 +470,9 @@ namespace vklite {
                 return availableFormat;
             }
 
-//            if (availableFormat.format == vk::Format::eR8G8B8A8Unorm && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
-//                return availableFormat;
-//            }
+            //            if (availableFormat.format == vk::Format::eR8G8B8A8Unorm && availableFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+            //                return availableFormat;
+            //            }
         }
 
         return availableFormats[0];
@@ -827,8 +822,8 @@ namespace vklite {
                 return "Format::eB8G8R8A8Sint";
             case vk::Format::eB8G8R8A8Srgb:
                 return "Format::eB8G8R8A8Srgb";
-                // 此处为简洁起见省略中间部分
-                // 完整实现应包含所有提供的格式枚举值...
+            // 此处为简洁起见省略中间部分
+            // 完整实现应包含所有提供的格式枚举值...
             case vk::Format::ePvrtc12BppUnormBlockIMG:
                 return "Format::ePvrtc12BppUnormBlockIMG";
             case vk::Format::ePvrtc14BppUnormBlockIMG:
@@ -909,25 +904,25 @@ namespace vklite {
                 return "ImageLayout::eVideoDecodeDpbKHR";
             case vk::ImageLayout::eSharedPresentKHR:
                 return "ImageLayout::eSharedPresentKHR";
-//            case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimalKHR: return "ImageLayout::eDepthReadOnlyStencilAttachmentOptimalKHR";
-//            case vk::ImageLayout::eDepthAttachmentStencilReadOnlyOptimalKHR: return "ImageLayout::eDepthAttachmentStencilReadOnlyOptimalKHR";
+            //            case vk::ImageLayout::eDepthReadOnlyStencilAttachmentOptimalKHR: return "ImageLayout::eDepthReadOnlyStencilAttachmentOptimalKHR";
+            //            case vk::ImageLayout::eDepthAttachmentStencilReadOnlyOptimalKHR: return "ImageLayout::eDepthAttachmentStencilReadOnlyOptimalKHR";
             case vk::ImageLayout::eShadingRateOptimalNV:
                 return "ImageLayout::eShadingRateOptimalNV";
             case vk::ImageLayout::eFragmentDensityMapOptimalEXT:
                 return "ImageLayout::eFragmentDensityMapOptimalEXT";
-//            case vk::ImageLayout::eFragmentShadingRateAttachmentOptimalKHR: return "ImageLayout::eFragmentShadingRateAttachmentOptimalKHR";
-//            case vk::ImageLayout::eDepthAttachmentOptimalKHR: return "ImageLayout::eDepthAttachmentOptimalKHR";
-//            case vk::ImageLayout::eDepthReadOnlyOptimalKHR: return "ImageLayout::eDepthReadOnlyOptimalKHR";
-//            case vk::ImageLayout::eStencilAttachmentOptimalKHR: return "ImageLayout::eStencilAttachmentOptimalKHR";
-//            case vk::ImageLayout::eStencilReadOnlyOptimalKHR: return "ImageLayout::eStencilReadOnlyOptimalKHR";
+            //            case vk::ImageLayout::eFragmentShadingRateAttachmentOptimalKHR: return "ImageLayout::eFragmentShadingRateAttachmentOptimalKHR";
+            //            case vk::ImageLayout::eDepthAttachmentOptimalKHR: return "ImageLayout::eDepthAttachmentOptimalKHR";
+            //            case vk::ImageLayout::eDepthReadOnlyOptimalKHR: return "ImageLayout::eDepthReadOnlyOptimalKHR";
+            //            case vk::ImageLayout::eStencilAttachmentOptimalKHR: return "ImageLayout::eStencilAttachmentOptimalKHR";
+            //            case vk::ImageLayout::eStencilReadOnlyOptimalKHR: return "ImageLayout::eStencilReadOnlyOptimalKHR";
             case vk::ImageLayout::eVideoEncodeDstKHR:
                 return "ImageLayout::eVideoEncodeDstKHR";
             case vk::ImageLayout::eVideoEncodeSrcKHR:
                 return "ImageLayout::eVideoEncodeSrcKHR";
             case vk::ImageLayout::eVideoEncodeDpbKHR:
                 return "ImageLayout::eVideoEncodeDpbKHR";
-//            case vk::ImageLayout::eReadOnlyOptimalKHR: return "ImageLayout::eReadOnlyOptimalKHR";
-//            case vk::ImageLayout::eAttachmentOptimalKHR: return "ImageLayout::eAttachmentOptimalKHR";
+            //            case vk::ImageLayout::eReadOnlyOptimalKHR: return "ImageLayout::eReadOnlyOptimalKHR";
+            //            case vk::ImageLayout::eAttachmentOptimalKHR: return "ImageLayout::eAttachmentOptimalKHR";
             case vk::ImageLayout::eAttachmentFeedbackLoopOptimalEXT:
                 return "ImageLayout::eAttachmentFeedbackLoopOptimalEXT";
             default:
@@ -1059,7 +1054,6 @@ namespace vklite {
         header += "|";
 
         // 输出表格
-        LOG_D("Available instance extensions:[%zd]", instanceExtensionProperties.size());
         LOG_D("%s", topLine.c_str());
         LOG_D("%s", header.c_str());
         LOG_D("%s", divider.c_str());
@@ -1082,5 +1076,4 @@ namespace vklite {
 
         LOG_D("%s", topLine.c_str());
     }
-
 } // vklite

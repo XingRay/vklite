@@ -13,14 +13,13 @@
 
 #else
 
-#define LOADER_NAMESPACE vk::detail
+// #define LOADER_NAMESPACE vk::detail
+#define LOADER_NAMESPACE vk
 
 #endif
 
 
-
 namespace vklite {
-
     extern PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
     extern PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties;
     extern PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties;
@@ -32,14 +31,12 @@ namespace vklite {
 
         static std::vector<vk::ExtensionProperties> enumerateInstanceExtensionProperties();
 
-        static std::vector<const char *> enumerateInstanceExtensionNames();
+        static std::vector<std::string> enumerateInstanceExtensionNames();
 
         static std::vector<vk::LayerProperties> enumerateInstanceLayerProperties();
 
-        static std::vector<const char *> enumerateInstanceLayerNames();
+        static std::vector<std::string> enumerateInstanceLayerNames();
 
         static vk::Instance createInstance(const vk::InstanceCreateInfo &instanceCreateInfo);
     };
-
-
 } // vklite

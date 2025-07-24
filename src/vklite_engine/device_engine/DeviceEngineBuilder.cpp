@@ -189,14 +189,14 @@ namespace vklite {
                                            vk::AccessFlagBits::eColorAttachmentWrite | vk::AccessFlagBits::eDepthStencilAttachmentWrite);
                 })
                 .addAttachmentIf(mMsaaEnable, [&](Attachment &attachment, std::vector<Subpass> &subpasses) {
-                    Attachment::msaaColorAttachment(attachment)
+                    attachment.msaaColorAttachment()
                             .sampleCount(sampleCount)
                             .format(swapchain->getVkFormat())
                             .clearColorValue(mClearColor)
                             .asColorAttachmentUsedIn(subpasses[0], vk::ImageLayout::eColorAttachmentOptimal);
                 })
                 .addAttachment([&](Attachment &attachment, std::vector<Subpass> &subpasses) {
-                    Attachment::presentColorAttachment(attachment)
+                    attachment.presentColorAttachment()
                             .format(swapchain->getVkFormat())
                             .clearColorValue(mClearColor)
                             .applyIf(mMsaaEnable, [&](Attachment &thiz) {
@@ -209,7 +209,7 @@ namespace vklite {
                             });
                 })
                 .addAttachmentIf(mDepthTestEnable, [&](Attachment &attachment, std::vector<Subpass> &subpasses) {
-                    Attachment::depthStencilAttachment(attachment)
+                    attachment.depthStencilAttachment()
                             .sampleCount(sampleCount)
                             .clearDepthValue(mClearDepth)
                             .format(physicalDevice->findDepthFormat())

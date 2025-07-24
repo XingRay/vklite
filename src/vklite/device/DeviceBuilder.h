@@ -28,8 +28,8 @@ namespace vklite {
         bool mCheckPhysicalDeviceFeatures;
         vk::PhysicalDeviceFeatures mRequiredPhysicalDeviceFeatures;
 
-        std::vector<const char *> mExtensions;
-        std::vector<const char *> mLayers;
+        std::vector<const char *> mEnabledExtensions;
+        std::vector<const char *> mEnabledLayers;
 
         // plugins
         std::vector<std::unique_ptr<PluginInterface>> mPlugins;

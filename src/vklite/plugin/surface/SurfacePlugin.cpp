@@ -7,17 +7,19 @@
 #include "vklite/Log.h"
 
 namespace vklite {
-
     SurfacePlugin::SurfacePlugin() = default;
 
     SurfacePlugin::~SurfacePlugin() = default;
 
     std::vector<const char *> SurfacePlugin::getInstanceExtensions() {
-        return {VK_KHR_SURFACE_EXTENSION_NAME};
+        return {
+            VK_KHR_SURFACE_EXTENSION_NAME
+        };
     }
 
     std::vector<const char *> SurfacePlugin::getInstanceLayers() {
-        return {};
+        return {
+        };
     }
 
     void SurfacePlugin::onPreCreateInstance(vk::InstanceCreateInfo &instanceCreateInfo) {
@@ -30,7 +32,9 @@ namespace vklite {
 
 
     std::vector<const char *> SurfacePlugin::getDeviceExtensions() {
-        return {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        return {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
     }
 
     std::vector<const char *> SurfacePlugin::getDeviceLayers() {
@@ -55,5 +59,4 @@ namespace vklite {
 
         return std::move(plugin);
     }
-
 } // vklite

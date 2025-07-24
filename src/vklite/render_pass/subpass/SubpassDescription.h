@@ -10,10 +10,8 @@
 #include <vulkan/vulkan.hpp>
 
 namespace vklite {
-
     class SubpassDescription {
     private:
-
         vk::SubpassDescriptionFlags mFlags;
         vk::PipelineBindPoint mPipelineBindPoint;
 
@@ -25,18 +23,25 @@ namespace vklite {
 
     public:
         explicit SubpassDescription(
-                vk::SubpassDescriptionFlags flags,
-                vk::PipelineBindPoint pipelineBindPoint,
-                std::vector<vk::AttachmentReference> inputAttachments,
-                std::vector<vk::AttachmentReference> colorAttachments,
-                std::vector<vk::AttachmentReference> resolveAttachments,
-                std::optional<vk::AttachmentReference> depthStencilAttachment,
-                std::vector<uint32_t> preserveAttachments);
+            vk::SubpassDescriptionFlags flags,
+            vk::PipelineBindPoint pipelineBindPoint,
+            std::vector<vk::AttachmentReference> inputAttachments,
+            std::vector<vk::AttachmentReference> colorAttachments,
+            std::vector<vk::AttachmentReference> resolveAttachments,
+            std::optional<vk::AttachmentReference> depthStencilAttachment,
+            std::vector<uint32_t> preserveAttachments);
 
         ~SubpassDescription();
+
+        SubpassDescription(const SubpassDescription &other);
+
+        SubpassDescription &operator=(const SubpassDescription &other);
+
+        SubpassDescription(SubpassDescription &&other) noexcept;
+
+        SubpassDescription &operator=(SubpassDescription &&other) noexcept;
 
         [[nodiscard]]
         vk::SubpassDescription createSubpassDescription() const;
     };
-
 } // vklite

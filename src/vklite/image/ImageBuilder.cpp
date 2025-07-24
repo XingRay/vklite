@@ -10,9 +10,8 @@
 #include "vklite/util/VulkanUtil.h"
 
 namespace vklite {
-
     ImageBuilder::ImageBuilder()
-            : mImageCreateInfo{}, mQueueFamilyIndices{} {
+        : mImageCreateInfo{}, mQueueFamilyIndices{} {
         mImageCreateInfo.setQueueFamilyIndices(mQueueFamilyIndices);
     }
 
@@ -75,17 +74,17 @@ namespace vklite {
         return *this;
     }
 
-//        //VK_IMAGE_TILING_LINEAR texel按行的顺序排列
-//        //VK_IMAGE_TILING_OPTIMAL texel按实现定义的顺序排列
-//        //the tiling mode cannot be changed at a later time.
-//        //如果希望能够直接访问图像内存中的texel，则必须使用VK_IMAGE_TILING_LINEAR
+    //        //VK_IMAGE_TILING_LINEAR texel按行的顺序排列
+    //        //VK_IMAGE_TILING_OPTIMAL texel按实现定义的顺序排列
+    //        //the tiling mode cannot be changed at a later time.
+    //        //如果希望能够直接访问图像内存中的texel，则必须使用VK_IMAGE_TILING_LINEAR
     ImageBuilder &ImageBuilder::tiling(vk::ImageTiling tiling) {
         mImageCreateInfo.tiling = tiling;
         return *this;
     }
 
-//        //VK_IMAGE_LAYOUT_UNDEFINED 不能被 GPU 使用，并且第一个转换将丢弃texel
-//        //VK_IMAGE_TILING_OPTIMAL 不能被 GPU 使用，并且第一个转换将保留texel
+    //        //VK_IMAGE_LAYOUT_UNDEFINED 不能被 GPU 使用，并且第一个转换将丢弃texel
+    //        //VK_IMAGE_TILING_OPTIMAL 不能被 GPU 使用，并且第一个转换将保留texel
     ImageBuilder &ImageBuilder::initialLayout(vk::ImageLayout initialLayout) {
         mImageCreateInfo.initialLayout = initialLayout;
         return *this;
@@ -158,7 +157,7 @@ namespace vklite {
         }
 
         vk::Image image = mDevice.createImage(mImageCreateInfo);
-//        LOG_D("mDevice.createImage(mImageCreateInfo) => %p", (void *) image);
+        //        LOG_D("mDevice.createImage(mImageCreateInfo) => %p", (void *) image);
 
         ImageMeta meta{mImageCreateInfo.format, mImageCreateInfo.extent, mImageCreateInfo.mipLevels};
 
@@ -205,5 +204,4 @@ namespace vklite {
                 .asDefault()
                 .usage(vk::ImageUsageFlagBits::eStorage | vk::ImageUsageFlagBits::eSampled);
     }
-
 } // vklite

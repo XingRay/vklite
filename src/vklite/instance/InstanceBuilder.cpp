@@ -24,9 +24,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 #include "vklite/util/VulkanUtil.h"
 
 namespace vklite {
-
     InstanceBuilder::InstanceBuilder() {
-
         mApplicationInfo = vk::ApplicationInfo{};
         mApplicationInfo
                 .setPApplicationName(VKLITE_APPLICATION_NAME)
@@ -38,26 +36,30 @@ namespace vklite {
         mInstanceCreateInfo = vk::InstanceCreateInfo{};
         mInstanceCreateInfo
                 .setPApplicationInfo(&mApplicationInfo)
-                .setPEnabledLayerNames(mLayers)
+                .setPEnabledLayerNames(mEnableLayers)
                 .setPEnabledExtensionNames(mExtensions);
     }
 
     InstanceBuilder::~InstanceBuilder() = default;
 
     InstanceBuilder::InstanceBuilder(InstanceBuilder &&other) noexcept
-            : mInstanceCreateInfo(std::move(other.mInstanceCreateInfo)),
-              mApplicationInfo(std::move(other.mApplicationInfo)),
-              mExtensions(std::move(other.mExtensions)),
-              mLayers(std::move(other.mLayers)),
-              mPlugins(std::move(other.mPlugins)) {}
+        : mInstanceCreateInfo(other.mInstanceCreateInfo),
+          mApplicationInfo(other.mApplicationInfo),
+          mExtensions(std::move(other.mExtensions)),
+          mEnableLayers(std::move(other.mEnableLayers)),
+          mPlugins(std::move(other.mPlugins)) {
+        mInstanceCreateInfo.setPApplicationInfo(&mApplicationInfo);
+    }
 
     InstanceBuilder &InstanceBuilder::operator=(InstanceBuilder &&other) noexcept {
         if (this != &other) {
-            mInstanceCreateInfo = std::move(other.mInstanceCreateInfo);
-            mApplicationInfo = std::move(other.mApplicationInfo);
+            mInstanceCreateInfo = other.mInstanceCreateInfo;
+            mApplicationInfo = other.mApplicationInfo;
             mExtensions = std::move(other.mExtensions);
-            mLayers = std::move(other.mLayers);
+            mEnableLayers = std::move(other.mEnableLayers);
             mPlugins = std::move(other.mPlugins);
+
+            mInstanceCreateInfo.setPApplicationInfo(&mApplicationInfo);
         }
         return *this;
     }
@@ -88,7 +90,7 @@ namespace vklite {
     }
 
     InstanceBuilder &InstanceBuilder::layers(std::vector<const char *> &&layers) {
-        mLayers = std::move(layers);
+        mEnableLayers = std::move(layers);
         return *this;
     }
 
@@ -105,10 +107,10 @@ namespace vklite {
         // InstanceExtension
         std::vector<vk::ExtensionProperties> instanceExtensionProperties = InstanceApi::enumerateInstanceExtensionProperties();
         VulkanUtil::printExtensions(instanceExtensionProperties);
-//        LOG_D("Available instance extensions:[%ld]", instanceExtensionProperties.size());
-//        for (const vk::ExtensionProperties &extensionProperty: instanceExtensionProperties) {
-//            LOG_D("\t%s ( version:%d )", extensionProperty.extensionName.data(), extensionProperty.specVersion);
-//        }
+        //        LOG_D("Available instance extensions:[%ld]", instanceExtensionProperties.size());
+        //        for (const vk::ExtensionProperties &extensionProperty: instanceExtensionProperties) {
+        //            LOG_D("\t%s ( version:%d )", extensionProperty.extensionName.data(), extensionProperty.specVersion);
+        //        }
 
         for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
             std::vector<const char *> pluginExtensions = plugin->getInstanceExtensions();
@@ -117,28 +119,29 @@ namespace vklite {
         mExtensions = CStringUtil::removeDuplicates(mExtensions);
         LOG_D("enabled instance extensions:[%zd]", mExtensions.size());
         for (const auto &extensionName: mExtensions) {
-            LOG_D("  %s", extensionName);
+            LOG_D("  extensionName: %s", extensionName);
         }
         mInstanceCreateInfo.setPEnabledExtensionNames(mExtensions);
 
         // Available Layers
-        std::vector<const char *> availableLayerNames = InstanceApi::enumerateInstanceLayerNames();
+        std::vector<std::string> availableLayerNames = InstanceApi::enumerateInstanceLayerNames();
         LOG_D("Available Layers : [%zd]", availableLayerNames.size());
         for (const auto &name: availableLayerNames) {
-            LOG_D("  %s", name);
+            LOG_D("  LayerName:  %s", name.c_str());
         }
 
         // plugin->getInstanceLayers
+        LOG_D("mPlugins.size:%zd", mPlugins.size());
         for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
             std::vector<const char *> pluginLayers = plugin->getInstanceLayers();
-            mLayers.insert(mLayers.begin(), std::move_iterator(pluginLayers.begin()), std::move_iterator(pluginLayers.end()));
+            mEnableLayers.insert(mEnableLayers.begin(), std::move_iterator(pluginLayers.begin()), std::move_iterator(pluginLayers.end()));
         }
-        mLayers = CStringUtil::removeDuplicates(mLayers);
-        LOG_D("enabled layer names:[%zd]", mLayers.size());
-        for (const auto &layerName: mLayers) {
-            LOG_D("  %s", layerName);
+        mEnableLayers = CStringUtil::removeDuplicates(mEnableLayers);
+        LOG_D("enabled layer names:[%zd]", mEnableLayers.size());
+        for (const auto &layerName: mEnableLayers) {
+            LOG_D("  enabled layer name: %s", layerName);
         }
-        mInstanceCreateInfo.setPEnabledLayerNames(mLayers);
+        mInstanceCreateInfo.setPEnabledLayerNames(mEnableLayers);
 
 
         // plugin->onPreCreateInstance
@@ -146,7 +149,9 @@ namespace vklite {
             plugin->onPreCreateInstance((vk::InstanceCreateInfo &) mInstanceCreateInfo);
         }
 
+        LOG_D("InstanceApi::createInstance");
         vk::Instance vkInstance = InstanceApi::createInstance(mInstanceCreateInfo);
+        LOG_D("InstanceApi::createInstance: %p", static_cast<void*>(vkInstance));
 
         LOADER_NAMESPACE::DispatchLoaderDynamic dispatchLoaderDynamic(vkInstance, vkGetInstanceProcAddr);
         dispatchLoaderDynamic.init(dynamicLoader);
@@ -164,5 +169,4 @@ namespace vklite {
     std::unique_ptr<Instance> InstanceBuilder::buildUnique() {
         return std::make_unique<Instance>(build());
     }
-
 } // vklite

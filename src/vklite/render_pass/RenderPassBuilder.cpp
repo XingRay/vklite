@@ -5,7 +5,6 @@
 #include "RenderPassBuilder.h"
 
 namespace vklite {
-
     RenderPassBuilder::RenderPassBuilder() = default;
 
     RenderPassBuilder::~RenderPassBuilder() = default;
@@ -24,10 +23,10 @@ namespace vklite {
         if (mAddAttachmentInvoked) {
             throw std::runtime_error("addSubpass must invoke before all of addAttachment()");
         }
-        Subpass Subpass{};
-        Subpass.index(static_cast<uint32_t>(mSubpasses.size()));
-        configure(Subpass, mSubpasses);
-        mSubpasses.push_back(std::move(Subpass));
+        Subpass subpass{};
+        subpass.index(static_cast<uint32_t>(mSubpasses.size()));
+        configure(subpass, mSubpasses);
+        mSubpasses.push_back(std::move(subpass));
         return *this;
     }
 
@@ -131,12 +130,21 @@ namespace vklite {
         }
         mRenderPassBeginInfo.clearValues(std::move(clearValues));
 
-        vk::RenderPass renderPass = mDevice.createRenderPass(mRenderPassCreateInfo);
+        vk::RenderPass renderPass;
+        LOG_D("mDevice.createRenderPass");
+        try {
+            renderPass = mDevice.createRenderPass(mRenderPassCreateInfo);
+        } catch (const vk::SystemError &e) {
+            LOG_D("Vulkan Error: %s", e.what());
+        }catch (const std::exception &e) {
+            LOG_D("Exception: %s", e.what());
+        }
+        LOG_D("mDevice.createRenderPass: renderPass: %p", static_cast<void*>(renderPass));
+
         return RenderPass{mDevice, renderPass, std::move(mRenderPassBeginInfo)};
     }
 
     std::unique_ptr<RenderPass> RenderPassBuilder::buildUnique() {
         return std::make_unique<RenderPass>(build());
     }
-
 } // vklite

@@ -1,5 +1,7 @@
 # 添加测试用例的公共依赖
 add_subdirectory(common)
+add_subdirectory(math)
+add_subdirectory(util)
 
 # 自动添加测试
 file(GLOB dirs

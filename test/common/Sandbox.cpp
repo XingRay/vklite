@@ -1,7 +1,7 @@
 #include "Sandbox.h"
 
 namespace test {
-    Sandbox::Sandbox(std::unique_ptr<TestBase>&& test)
+    Sandbox::Sandbox(std::unique_ptr<TestBase> &&test)
         : mTest(std::move(test)),
           mWindow(nullptr) {
     }
@@ -35,7 +35,7 @@ namespace test {
             test->onWindowResized(width, height);
         });
 
-        mTest->init();
+        mTest->init(mWindow, mWidth, mHeight);
     }
 
     void Sandbox::mainLoop() {

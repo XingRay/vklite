@@ -9,7 +9,6 @@
 #include "vklite/Log.h"
 
 namespace vklite {
-
     bool mInited = false;
 
     PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
@@ -56,10 +55,14 @@ namespace vklite {
         return extensions;
     }
 
-    std::vector<const char *> InstanceApi::enumerateInstanceExtensionNames() {
-        std::vector<vk::ExtensionProperties> extensions = InstanceApi::enumerateInstanceExtensionProperties();
+    std::vector<std::string> InstanceApi::enumerateInstanceExtensionNames() {
+        uint32_t extensionCount = 0;
+        CALL_VK(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr));
 
-        std::vector<const char *> names;
+        std::vector<vk::ExtensionProperties> extensions(extensionCount);
+        CALL_VK(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, (VkExtensionProperties *) extensions.data()));
+
+        std::vector<std::string> names;
         names.reserve(extensions.size());
         for (const auto &extensionProperties: extensions) {
             names.push_back(extensionProperties.extensionName);
@@ -78,22 +81,30 @@ namespace vklite {
         return layers;
     }
 
-    std::vector<const char *> InstanceApi::enumerateInstanceLayerNames() {
-        std::vector<vk::LayerProperties> layers = InstanceApi::enumerateInstanceLayerProperties();
+    std::vector<std::string> InstanceApi::enumerateInstanceLayerNames() {
+        uint32_t layerCount = 0;
+        CALL_VK(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
 
-        std::vector<const char *> names;
+        std::vector<vk::LayerProperties> layers(layerCount);
+        CALL_VK(vkEnumerateInstanceLayerProperties(&layerCount, (VkLayerProperties *) layers.data()));
+
+        std::vector<std::string> names;
+        names.reserve(layers.size());
+
+        // LOG_D("enumerateInstanceLayerNames: [%d]", layerCount);
         for (const auto &layerProperties: layers) {
-            LOG_D("  %s", layerProperties.layerName.data());
+            // LOG_D("  layerName: %s", layerProperties.layerName.data());
             names.push_back(layerProperties.layerName);
         }
 
         return names;
     }
 
-    vk::Instance InstanceApi::createInstance(const vk::InstanceCreateInfo& instanceCreateInfo) {
+    vk::Instance InstanceApi::createInstance(const vk::InstanceCreateInfo &instanceCreateInfo) {
         vk::Instance instance;
+        LOG_D("InstanceApi::createInstance: vkCreateInstance:%p", static_cast<void*>(vkCreateInstance));
         CALL_VK(vkCreateInstance((VkInstanceCreateInfo *) &instanceCreateInfo, nullptr, (VkInstance *) &instance));
+        LOG_D("InstanceApi::createInstance: instance:%p", static_cast<void*>(instance));
         return instance;
     }
-
 } // vklite

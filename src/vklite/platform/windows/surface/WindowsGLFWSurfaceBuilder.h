@@ -16,8 +16,6 @@
 #include "vklite/surface/Surface.h"
 #include "vklite/surface/SurfaceBuilder.h"
 
-#include "vklite/instance/Instance.h"
-
 namespace vklite {
     class WindowsGLFWSurfaceBuilder : public SurfaceBuilder {
     private:
@@ -27,9 +25,9 @@ namespace vklite {
     public:
         WindowsGLFWSurfaceBuilder();
 
-        WindowsGLFWSurfaceBuilder(const WindowsGLFWSurfaceBuilder &other)=delete;
+        WindowsGLFWSurfaceBuilder(const WindowsGLFWSurfaceBuilder &other) = delete;
 
-        WindowsGLFWSurfaceBuilder &operator=(const WindowsGLFWSurfaceBuilder &other)=delete;
+        WindowsGLFWSurfaceBuilder &operator=(const WindowsGLFWSurfaceBuilder &other) = delete;
 
         WindowsGLFWSurfaceBuilder(WindowsGLFWSurfaceBuilder &&other) noexcept;
 

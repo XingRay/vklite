@@ -16,5 +16,5 @@ add_executable(${CURRENT_TEST_NAME}
 )
 
 target_link_libraries(${CURRENT_TEST_NAME}
-        PRIVATE vklite test_common
+        PRIVATE vklite test_common math util
 )

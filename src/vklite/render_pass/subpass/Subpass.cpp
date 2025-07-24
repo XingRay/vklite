@@ -7,13 +7,52 @@
 #include <format>
 
 namespace vklite {
-
     Subpass::Subpass()
-            : mIndex(0),
-              mPipelineBindPoint(vk::PipelineBindPoint::eGraphics),
-              mFlags(vk::SubpassDescriptionFlags{}) {}
+        : mIndex(0),
+          mFlags(vk::SubpassDescriptionFlags{}),
+          mPipelineBindPoint(vk::PipelineBindPoint::eGraphics),
+
+          mInputAttachments{},
+          mColorAttachments{},
+          mResolveAttachments{},
+          mDepthStencilAttachment{},
+          mPreserveAttachments{},
+
+          mDependencies{} {
+    }
 
     Subpass::~Subpass() = default;
+
+    Subpass::Subpass(Subpass &&other) noexcept
+        : mIndex(std::exchange(other.mIndex, 0)),
+          mFlags(std::exchange(other.mFlags, {})),
+          mPipelineBindPoint(std::exchange(other.mPipelineBindPoint, {})),
+
+          mInputAttachments(std::move(other.mInputAttachments)),
+          mColorAttachments(std::move(other.mColorAttachments)),
+          mResolveAttachments(std::move(other.mResolveAttachments)),
+          mDepthStencilAttachment(std::move(other.mDepthStencilAttachment)),
+          mPreserveAttachments(std::move(other.mPreserveAttachments)),
+
+          mDependencies(std::move(other.mDependencies)) {
+    }
+
+    Subpass &Subpass::operator=(Subpass &&other) noexcept {
+        if (this != &other) {
+            mIndex = std::exchange(other.mIndex, 0);
+            mFlags = std::exchange(other.mFlags, {});
+            mPipelineBindPoint = std::exchange(other.mPipelineBindPoint, {});
+
+            mInputAttachments = std::move(other.mInputAttachments);
+            mColorAttachments = std::move(other.mColorAttachments);
+            mResolveAttachments = std::move(other.mResolveAttachments);
+            mDepthStencilAttachment = std::move(other.mDepthStencilAttachment);
+            mPreserveAttachments = std::move(other.mPreserveAttachments);
+
+            mDependencies = std::move(other.mDependencies);
+        }
+        return *this;
+    }
 
     Subpass &Subpass::flags(vk::SubpassDescriptionFlags flags) {
         mFlags = flags;
@@ -43,27 +82,27 @@ namespace vklite {
     }
 
     Subpass &Subpass::addInputAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mInputAttachments.push_back(std::move(AttachmentReference(attachment, layout)));
+        mInputAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
         return *this;
     }
 
     Subpass &Subpass::addColorAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mColorAttachments.push_back(std::move(AttachmentReference(attachment, layout)));
+        mColorAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
         return *this;
     }
 
     Subpass &Subpass::addResolveAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mResolveAttachments.push_back(std::move(AttachmentReference(attachment, layout)));
+        mResolveAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
         return *this;
     }
 
     Subpass &Subpass::setDepthStencilAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mDepthStencilAttachment = std::move(AttachmentReference(attachment, layout));
+        mDepthStencilAttachment = std::move(vk::AttachmentReference(attachment.getIndex(), layout));
         return *this;
     }
 
     Subpass &Subpass::addPreserveAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mPreserveAttachments.push_back(std::move(AttachmentReference(attachment, layout)));
+        mPreserveAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
         return *this;
     }
 
@@ -71,41 +110,24 @@ namespace vklite {
         return mIndex;
     }
 
-    std::vector<vk::AttachmentReference> convertAttachments(const std::vector<AttachmentReference> &attachmentReferences) {
-        std::vector<vk::AttachmentReference> vkAttachmentReferences;
-        vkAttachmentReferences.reserve(attachmentReferences.size());
-        for (const AttachmentReference &attachmentReference: attachmentReferences) {
-            vkAttachmentReferences.push_back(attachmentReference.createAttachmentReference());
-        }
-        return vkAttachmentReferences;
-    }
-
-    std::optional<vk::AttachmentReference> convertDepthStencilAttachment(const std::optional<AttachmentReference> &attachmentReference) {
-        if (attachmentReference.has_value()) {
-            return attachmentReference.value().createAttachmentReference();
-        } else {
-            return std::nullopt;
-        }
-    }
-
-    std::vector<uint32_t> convertPreserveAttachments(const std::vector<AttachmentReference> &attachmentReferences) {
+    std::vector<uint32_t> convertPreserveAttachments(const std::vector<vk::AttachmentReference> &attachmentReferences) {
         std::vector<uint32_t> attachmentIndices;
         attachmentIndices.reserve(attachmentReferences.size());
-        for (const AttachmentReference &attachmentReference: attachmentReferences) {
-            attachmentIndices.push_back(attachmentReference.getIndex());
+        for (const vk::AttachmentReference &attachmentReference: attachmentReferences) {
+            attachmentIndices.push_back(attachmentReference.attachment);
         }
         return attachmentIndices;
     }
 
     SubpassDescription Subpass::createSubpassDescription() const {
         return SubpassDescription{
-                mFlags,
-                mPipelineBindPoint,
-                convertAttachments(mInputAttachments),
-                convertAttachments(mColorAttachments),
-                convertAttachments(mResolveAttachments),
-                convertDepthStencilAttachment(mDepthStencilAttachment),
-                convertPreserveAttachments(mPreserveAttachments)
+            mFlags,
+            mPipelineBindPoint,
+            mInputAttachments,
+            mColorAttachments,
+            mResolveAttachments,
+            mDepthStencilAttachment,
+            convertPreserveAttachments(mPreserveAttachments)
         };
     }
 
@@ -125,5 +147,4 @@ namespace vklite {
                 .index(vk::SubpassExternal);
         return externalSubpass;
     }
-
 } // vklite

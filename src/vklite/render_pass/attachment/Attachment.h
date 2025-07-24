@@ -9,7 +9,6 @@
 #include <vulkan/vulkan.hpp>
 
 namespace vklite {
-
     class Subpass;
 
     class Attachment {
@@ -35,6 +34,14 @@ namespace vklite {
 
         ~Attachment();
 
+        Attachment(const Attachment &other);
+
+        Attachment &operator=(const Attachment &other);
+
+        Attachment(Attachment &&other) noexcept;
+
+        Attachment &operator=(Attachment &&other) noexcept;
+
         [[nodiscard]]
         uint32_t getIndex() const;
 
@@ -59,25 +66,25 @@ namespace vklite {
 
         Attachment &index(uint32_t index);
 
-        Attachment &asInputAttachmentUsedIn(Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+        Attachment &asInputAttachmentUsedIn(Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
 
-        Attachment &asInputAttachmentUsedInIf(bool condition, Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
+        Attachment &asInputAttachmentUsedInIf(bool condition, Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal);
 
-        Attachment &asColorAttachmentUsedIn(Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
+        Attachment &asColorAttachmentUsedIn(Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
 
-        Attachment &asColorAttachmentUsedInIf(bool condition, Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
+        Attachment &asColorAttachmentUsedInIf(bool condition, Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
 
-        Attachment &asResolveAttachmentUsedIn(Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
+        Attachment &asResolveAttachmentUsedIn(Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
 
-        Attachment &asResolveAttachmentUsedInIf(bool condition, Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
+        Attachment &asResolveAttachmentUsedInIf(bool condition, Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eColorAttachmentOptimal);
 
-        Attachment &asDepthStencilAttachmentUsedIn(Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eDepthStencilAttachmentOptimal);
+        Attachment &asDepthStencilAttachmentUsedIn(Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eDepthStencilAttachmentOptimal);
 
-        Attachment &asDepthStencilAttachmentUsedInIf(bool condition, Subpass &Subpass, vk::ImageLayout layout = vk::ImageLayout::eDepthStencilAttachmentOptimal);
+        Attachment &asDepthStencilAttachmentUsedInIf(bool condition, Subpass &subpass, vk::ImageLayout layout = vk::ImageLayout::eDepthStencilAttachmentOptimal);
 
-        Attachment &asPreserveAttachmentUsedIn(Subpass &Subpass, vk::ImageLayout layout);
+        Attachment &asPreserveAttachmentUsedIn(Subpass &subpass, vk::ImageLayout layout);
 
-        Attachment &asPreserveAttachmentUsedInIf(bool condition, Subpass &Subpass, vk::ImageLayout layout);
+        Attachment &asPreserveAttachmentUsedInIf(bool condition, Subpass &subpass, vk::ImageLayout layout);
 
         Attachment &applyIf(bool condition, const std::function<void(Attachment &attachment)> &handler);
 
@@ -96,13 +103,12 @@ namespace vklite {
         [[nodiscard]]
         vk::AttachmentDescription createAttachmentDescription() const;
 
-    public:// static
+    public: // static
 
-        static Attachment &msaaColorAttachment(Attachment &attachment);
+        Attachment &msaaColorAttachment();
 
-        static Attachment &depthStencilAttachment(Attachment &attachment);
+        Attachment &depthStencilAttachment();
 
-        static Attachment &presentColorAttachment(Attachment &attachment);
+        Attachment &presentColorAttachment();
     };
-
 } // vklite

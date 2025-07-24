@@ -16,5 +16,5 @@ target_include_directories(test_common
 )
 
 target_link_libraries(test_common PUBLIC
-        vklite
+        vklite glm
 )

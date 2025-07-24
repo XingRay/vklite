@@ -4,6 +4,7 @@
 
 #include "DeviceBuilder.h"
 
+#include <iostream>
 #include <unordered_set>
 
 #include "vklite/Log.h"
@@ -11,32 +12,36 @@
 #include "vklite/util/VulkanUtil.h"
 
 namespace vklite {
-
     DeviceBuilder::DeviceBuilder()
-            : mCheckPhysicalDeviceFeatures(false) {
+        : mCheckPhysicalDeviceFeatures(true) {
+        mRequiredPhysicalDeviceFeatures = vk::PhysicalDeviceFeatures();
+
         mDeviceCreateInfo = vk::DeviceCreateInfo{};
         mDeviceCreateInfo
                 .setFlags(vk::DeviceCreateFlags{})
                 .setQueueCreateInfos(mDeviceQueueCreateInfos)
                 .setPEnabledFeatures(&mRequiredPhysicalDeviceFeatures)
-                .setPEnabledExtensionNames(mExtensions)
-                .setPEnabledLayerNames(mLayers);
+                .setPEnabledExtensionNames(mEnabledExtensions)
+                .setPEnabledLayerNames(mEnabledLayers);
     }
 
     DeviceBuilder::~DeviceBuilder() = default;
 
     DeviceBuilder::DeviceBuilder(DeviceBuilder &&other) noexcept
-            : mPhysicalDevice(other.mPhysicalDevice),
-              mDeviceCreateInfo(other.mDeviceCreateInfo),
-              mDeviceQueueCreateInfos(std::move(other.mDeviceQueueCreateInfos)),
-              mQueuePriorities(std::move(other.mQueuePriorities)),
-              mCheckPhysicalDeviceFeatures(std::exchange(other.mCheckPhysicalDeviceFeatures, false)),
-              mRequiredPhysicalDeviceFeatures(other.mRequiredPhysicalDeviceFeatures),
-              mExtensions(std::move(other.mExtensions)),
-              mLayers(std::move(other.mLayers)),
-              mPlugins(std::move(other.mPlugins)) {
-        other.mDeviceCreateInfo = vk::DeviceCreateInfo{}; // 重置为默认状态
-        other.mRequiredPhysicalDeviceFeatures = vk::PhysicalDeviceFeatures{};
+        : mPhysicalDevice(other.mPhysicalDevice),
+          mDeviceCreateInfo(other.mDeviceCreateInfo),
+          mDeviceQueueCreateInfos(std::move(other.mDeviceQueueCreateInfos)),
+          mQueuePriorities(std::move(other.mQueuePriorities)),
+          mCheckPhysicalDeviceFeatures(std::exchange(other.mCheckPhysicalDeviceFeatures, false)),
+          mRequiredPhysicalDeviceFeatures(other.mRequiredPhysicalDeviceFeatures),
+          mEnabledExtensions(std::move(other.mEnabledExtensions)),
+          mEnabledLayers(std::move(other.mEnabledLayers)),
+          mPlugins(std::move(other.mPlugins)) {
+        mDeviceCreateInfo
+                .setPEnabledFeatures(&mRequiredPhysicalDeviceFeatures)
+                .setPEnabledExtensionNames(mEnabledExtensions)
+                .setPEnabledLayerNames(mEnabledLayers)
+                .setQueueCreateInfos(mDeviceQueueCreateInfos);
     }
 
     DeviceBuilder &DeviceBuilder::operator=(DeviceBuilder &&other) noexcept {
@@ -47,13 +52,15 @@ namespace vklite {
             mQueuePriorities = std::move(other.mQueuePriorities);
             mCheckPhysicalDeviceFeatures = std::exchange(other.mCheckPhysicalDeviceFeatures, false);
             mRequiredPhysicalDeviceFeatures = other.mRequiredPhysicalDeviceFeatures;
-            mExtensions = std::move(other.mExtensions);
-            mLayers = std::move(other.mLayers);
+            mEnabledExtensions = std::move(other.mEnabledExtensions);
+            mEnabledLayers = std::move(other.mEnabledLayers);
             mPlugins = std::move(other.mPlugins);
 
-            // 清理源对象状态
-            other.mDeviceCreateInfo = vk::DeviceCreateInfo{};
-            other.mRequiredPhysicalDeviceFeatures = vk::PhysicalDeviceFeatures{};
+            mDeviceCreateInfo
+                    .setPEnabledFeatures(&mRequiredPhysicalDeviceFeatures)
+                    .setPEnabledExtensionNames(mEnabledExtensions)
+                    .setPEnabledLayerNames(mEnabledLayers)
+                    .setQueueCreateInfos(mDeviceQueueCreateInfos);
         }
         return *this;
     }
@@ -91,7 +98,7 @@ namespace vklite {
         } else {
             // found, then update
             // 计算索引
-            LOG_WF("DeviceBuilder::addQueueFamily, queueFamilyIndex:{} exists, overwrite it", queueFamilyIndex);
+            LOG_WF("DeviceBuilder::addQueueFamily, queueFamilyIndex: {} exists, overwrite it", queueFamilyIndex);
             size_t index = std::distance(mDeviceQueueCreateInfos.begin(), it);
             mQueuePriorities[index] = std::move(priorities);
 
@@ -114,12 +121,12 @@ namespace vklite {
     }
 
     DeviceBuilder &DeviceBuilder::extensions(std::vector<const char *> &&extensions) {
-        mExtensions = std::move(extensions);
+        mEnabledExtensions = std::move(extensions);
         return *this;
     }
 
     DeviceBuilder &DeviceBuilder::layers(std::vector<const char *> &&layers) {
-        mLayers = std::move(layers);
+        mEnabledLayers = std::move(layers);
         return *this;
     }
 
@@ -144,7 +151,6 @@ namespace vklite {
     }
 
     Device DeviceBuilder::build() {
-
         std::vector<vk::QueueFamilyProperties> queueFamilyProperties = mPhysicalDevice.getQueueFamilyProperties();
         size_t queueFamilyPropertiesSize = queueFamilyProperties.size();
         for (const auto &queueCreateInfo: mDeviceQueueCreateInfos) {
@@ -177,39 +183,51 @@ namespace vklite {
 
         for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
             std::vector<const char *> deviceExtensions = plugin->getDeviceExtensions();
-            mExtensions.insert(mExtensions.end(), std::move_iterator(deviceExtensions.begin()), std::move_iterator(deviceExtensions.end()));
+            mEnabledExtensions.insert(mEnabledExtensions.end(), std::move_iterator(deviceExtensions.begin()), std::move_iterator(deviceExtensions.end()));
 
             std::vector<const char *> layers = plugin->getDeviceLayers();
-            mLayers.insert(mLayers.end(), std::move_iterator(layers.begin()), std::move_iterator(layers.end()));
+            mEnabledLayers.insert(mEnabledLayers.end(), std::move_iterator(layers.begin()), std::move_iterator(layers.end()));
         }
 
-        mExtensions = CStringUtil::removeDuplicates(mExtensions);
-        LOG_D("DeviceBuilder::build: extensions:");
-        for (const char *name: mExtensions) {
-            LOG_D("\t%s", name);
+        mEnabledExtensions = CStringUtil::removeDuplicates(mEnabledExtensions);
+        LOG_D("DeviceBuilder::build: mEnabledExtensions:[%zd]", mEnabledExtensions.size());
+        for (const char *name: mEnabledExtensions) {
+            LOG_D("  extension name: %s", name);
         }
-        mDeviceCreateInfo.setPEnabledExtensionNames(mExtensions);
+        mDeviceCreateInfo.setPEnabledExtensionNames(mEnabledExtensions);
 
-        mLayers = CStringUtil::removeDuplicates(mLayers);
-        LOG_D("DeviceBuilder::build: layers:");
-        for (const char *name: mLayers) {
-            LOG_D("\t%s", name);
+        mEnabledLayers = CStringUtil::removeDuplicates(mEnabledLayers);
+        LOG_D("DeviceBuilder::build: mEnabledLayers: [%zd]", mEnabledLayers.size());
+        for (const char *name: mEnabledLayers) {
+            LOG_D("  layer name: %s", name);
         }
-        mDeviceCreateInfo.setPEnabledLayerNames(mLayers);
+        mDeviceCreateInfo.setPEnabledLayerNames(mEnabledLayers);
 
-//        vk::DeviceCreateInfo deviceCreateInfo;
-//        deviceCreateInfo
-//                .setFlags(mFlags)
-//                .setQueueCreateInfos(queueCreateInfos)
-//                .setPEnabledFeatures(&mRequiredPhysicalDeviceFeatures)
-//                .setPEnabledExtensionNames(mExtensions)
-//                .setPEnabledLayerNames(mLayers);
+        //        vk::DeviceCreateInfo deviceCreateInfo;
+        //        deviceCreateInfo
+        //                .setFlags(mFlags)
+        //                .setQueueCreateInfos(queueCreateInfos)
+        //                .setPEnabledFeatures(&mRequiredPhysicalDeviceFeatures)
+        //                .setPEnabledExtensionNames(mExtensions)
+        //                .setPEnabledLayerNames(mLayers);
 
         for (const std::unique_ptr<PluginInterface> &devicePlugin: mPlugins) {
             devicePlugin->onPreCreateDevice(mDeviceCreateInfo);
         }
 
-        vk::Device device = mPhysicalDevice.createDevice(mDeviceCreateInfo);
+        LOG_D("mPhysicalDevice.createDevice");
+        vk::Device device = nullptr;
+        try {
+            device = mPhysicalDevice.createDevice(mDeviceCreateInfo);
+        } catch (const vk::SystemError &e) {
+            // 捕获Vulkan C++异常
+            std::cerr << "Vulkan Error: " << e.what() << std::endl;
+        }catch (const std::exception &e) {
+            // 捕获标准异常
+            std::cerr << "Exception: " << e.what() << std::endl;
+        }
+
+        LOG_D("mPhysicalDevice.createDevice: device:%p", static_cast<void*>(device));
         return Device(device);
     }
 
@@ -220,7 +238,6 @@ namespace vklite {
     void DeviceBuilder::checkPhysicalDeviceFeatures() {
         vk::PhysicalDeviceFeatures supportedPhysicalDeviceFeatures = mPhysicalDevice.getFeatures();
 
-        // 核心图形特性检查
         if (mRequiredPhysicalDeviceFeatures.robustBufferAccess && !supportedPhysicalDeviceFeatures.robustBufferAccess) {
             throw std::runtime_error("robustBufferAccess not supported");
         }
@@ -460,5 +477,4 @@ namespace vklite {
             throw std::runtime_error("inheritedQueries not supported");
         }
     }
-
 } // vklite

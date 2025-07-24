@@ -8,12 +8,12 @@
 #include <functional>
 
 #include <vulkan/vulkan.hpp>
+
+#include "vklite/render_pass/attachment/Attachment.h"
 #include "vklite/render_pass/subpass/SubpassDescription.h"
-#include "vklite/render_pass/attachment/AttachmentReference.h"
 #include "vklite/render_pass/subpass/SubpassDependency.h"
 
 namespace vklite {
-
     class Subpass {
     private:
         uint32_t mIndex;
@@ -23,11 +23,11 @@ namespace vklite {
         vk::PipelineBindPoint mPipelineBindPoint;
 
         // attachments
-        std::vector<AttachmentReference> mInputAttachments;
-        std::vector<AttachmentReference> mColorAttachments;
-        std::vector<AttachmentReference> mResolveAttachments;
-        std::optional<AttachmentReference> mDepthStencilAttachment;
-        std::vector<AttachmentReference> mPreserveAttachments;
+        std::vector<vk::AttachmentReference> mInputAttachments;
+        std::vector<vk::AttachmentReference> mColorAttachments;
+        std::vector<vk::AttachmentReference> mResolveAttachments;
+        std::optional<vk::AttachmentReference> mDepthStencilAttachment;
+        std::vector<vk::AttachmentReference> mPreserveAttachments;
 
         // dependencies
         std::vector<SubpassDependency> mDependencies;
@@ -36,6 +36,14 @@ namespace vklite {
         explicit Subpass();
 
         ~Subpass();
+
+        Subpass(const Subpass &other) = delete;
+
+        Subpass &operator=(const Subpass &other) = delete;
+
+        Subpass(Subpass &&other) noexcept;
+
+        Subpass &operator=(Subpass &&other) noexcept;
 
         Subpass &flags(vk::SubpassDescriptionFlags flags);
 
@@ -65,8 +73,7 @@ namespace vklite {
         [[nodiscard]]
         std::vector<vk::SubpassDependency> createSubpassDependencies() const;
 
-    public://static
+    public: //static
         static Subpass externalSubpass();
     };
-
 } // vklite

@@ -9,7 +9,9 @@
 #include "vklite/surface/Surface.h"
 
 namespace vklite {
-    WindowsGLFWSurfaceBuilder::WindowsGLFWSurfaceBuilder() = default;
+    WindowsGLFWSurfaceBuilder::WindowsGLFWSurfaceBuilder()
+        : mInstance(nullptr), mWindow(nullptr) {
+    }
 
     WindowsGLFWSurfaceBuilder::WindowsGLFWSurfaceBuilder(WindowsGLFWSurfaceBuilder &&other) noexcept
         : mInstance(std::exchange(other.mInstance, nullptr)),

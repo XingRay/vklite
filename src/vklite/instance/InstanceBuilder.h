@@ -38,7 +38,7 @@ namespace vklite {
         vk::ApplicationInfo mApplicationInfo;
 
         std::vector<const char *> mExtensions;
-        std::vector<const char *> mLayers;
+        std::vector<const char *> mEnableLayers;
 
         std::vector<std::unique_ptr<PluginInterface>> mPlugins;
 
