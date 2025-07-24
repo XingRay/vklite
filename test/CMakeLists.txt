@@ -2,6 +2,7 @@
 add_subdirectory(common)
 add_subdirectory(math)
 add_subdirectory(util)
+add_subdirectory(image)
 
 # 自动添加测试
 file(GLOB dirs
