@@ -11,7 +11,7 @@
 
 namespace test {
     Test03::Test03() {
-        LOG_D("Test02::Test02()");
+        LOG_D("Test03::Test03()");
     }
 
     Test03::~Test03() = default;
