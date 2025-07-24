@@ -95,7 +95,7 @@ namespace test {
                                            20.0f);
         mTimer.start();
 
-        std::unique_ptr<image::ImageInterface> textureImage = image::StbImage::loadImage("resources/images/01.jpg", STBI_rgb_alpha);
+        std::unique_ptr<image::ImageInterface> textureImage = image::StbImage::loadImage("resource/image/01.jpg", STBI_rgb_alpha);
 
         mSamplers = mEngine->samplerBuilder()
                 .width(textureImage->getWidth())

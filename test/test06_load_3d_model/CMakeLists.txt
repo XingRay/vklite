@@ -16,11 +16,11 @@ add_executable(${CURRENT_TEST_NAME}
 )
 
 target_link_libraries(${CURRENT_TEST_NAME}
-        PRIVATE vklite test_common math util image
+        PRIVATE vklite test_common math util image model
 )
 
 file(GLOB SPV_FILES
-        "${PROJECT_SOURCE_DIR}/test/spv/05_*.spv"
+        "${PROJECT_SOURCE_DIR}/test/spv/06_*.spv"
 )
 foreach (SPV_FILE ${SPV_FILES})
     get_filename_component(SPV_FILE_NAME ${SPV_FILE} NAME)
@@ -31,12 +31,8 @@ foreach (SPV_FILE ${SPV_FILES})
     )
 endforeach ()
 
-set(TEST_IMAGES "${PROJECT_SOURCE_DIR}/test/resource/image/01.jpg")
-foreach (IMAGE_FILE ${TEST_IMAGES})
-    get_filename_component(IMAGE_FILE_NAME ${IMAGE_FILE} NAME)
-    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${IMAGE_FILE}"
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/image/${IMAGE_FILE_NAME}"
-    )
-endforeach ()
+add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/test/resource/model"
+        "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/model"
+)
