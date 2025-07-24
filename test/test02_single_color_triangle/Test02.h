@@ -22,11 +22,17 @@ namespace test {
         glm::vec3 pos;
     };
 
+    struct ColorUniformBufferObject {
+        // 颜色数据
+        alignas(16) glm::vec3 color;
+    };
+
     class Test02 : public TestBase {
     private:
         std::unique_ptr<vklite::GraphicPipelineEngine> mEngine;
         std::unique_ptr<vklite::IndexBuffer> mIndexBuffer;
         std::unique_ptr<vklite::VertexBuffer> mVertexBuffer;
+        std::vector<vklite::UniformBuffer> mUniformBuffers;
 
     public:
         Test02();

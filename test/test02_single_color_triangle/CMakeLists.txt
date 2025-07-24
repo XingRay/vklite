@@ -19,12 +19,9 @@ target_link_libraries(${CURRENT_TEST_NAME}
         PRIVATE vklite test_common math util
 )
 
-message("PROJECT_SOURCE_DIR:${PROJECT_SOURCE_DIR}")
 file(GLOB SPV_FILES
-        "${PROJECT_SOURCE_DIR}/test/spv/01_*.spv"
+        "${PROJECT_SOURCE_DIR}/test/spv/02_*.spv"
 )
-message("SPV_FILES:${SPV_FILES}")
-message("CMAKE_CURRENT_BINARY_DIR:${CMAKE_CURRENT_BINARY_DIR}")
 foreach (SPV_FILE ${SPV_FILES})
     get_filename_component(SPV_FILE_NAME ${SPV_FILE} NAME)
     add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
