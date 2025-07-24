@@ -82,27 +82,27 @@ namespace vklite {
     }
 
     Subpass &Subpass::addInputAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mInputAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
+        mInputAttachments.emplace_back(attachment.getIndex(), layout);
         return *this;
     }
 
     Subpass &Subpass::addColorAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mColorAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
+        mColorAttachments.emplace_back(attachment.getIndex(), layout);
         return *this;
     }
 
     Subpass &Subpass::addResolveAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mResolveAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
+        mResolveAttachments.emplace_back(attachment.getIndex(), layout);
         return *this;
     }
 
     Subpass &Subpass::setDepthStencilAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mDepthStencilAttachment = std::move(vk::AttachmentReference(attachment.getIndex(), layout));
+        mDepthStencilAttachment = vk::AttachmentReference(attachment.getIndex(), layout);
         return *this;
     }
 
     Subpass &Subpass::addPreserveAttachment(const Attachment &attachment, vk::ImageLayout layout) {
-        mPreserveAttachments.push_back(vk::AttachmentReference(attachment.getIndex(), layout));
+        mPreserveAttachments.emplace_back(attachment.getIndex(), layout);
         return *this;
     }
 

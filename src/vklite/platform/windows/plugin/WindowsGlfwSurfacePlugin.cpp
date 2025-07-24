@@ -29,9 +29,7 @@ namespace vklite {
     }
 
     std::vector<const char *> WindowsGlfwSurfacePlugin::getInstanceLayers() {
-        return {
-            "VK_LAYER_KHRONOS_validation"
-        };
+        return {};
     }
 
     void WindowsGlfwSurfacePlugin::onPreCreateInstance(vk::InstanceCreateInfo &instanceCreateInfo) {
@@ -56,9 +54,7 @@ namespace vklite {
     }
 
     /*
-     *
      * static methods
-     *
      */
     std::unique_ptr<WindowsGlfwSurfacePlugin> WindowsGlfwSurfacePlugin::buildUnique() {
         return std::make_unique<WindowsGlfwSurfacePlugin>();
