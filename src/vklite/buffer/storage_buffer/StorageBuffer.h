@@ -11,7 +11,6 @@
 #include "vklite/command_pool/CommandPool.h"
 
 namespace vklite {
-
     class StorageBuffer {
     private:
         vk::Device mDevice;
@@ -61,7 +60,6 @@ namespace vklite {
 
         StorageBuffer &update(const CommandPool &commandPool, const StagingBuffer &stagingBuffer);
 
-        StorageBuffer &update(const CommandPool &commandPool, const void *data, uint32_t size);
+        StorageBuffer &update(const CommandPool &commandPool, const void *data, vk::DeviceSize size);
     };
-
 } // vklite

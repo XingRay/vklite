@@ -89,7 +89,7 @@ namespace vklite {
         return *this;
     }
 
-    StorageBuffer &StorageBuffer::update(const CommandPool &commandPool, const void *data, uint32_t size) {
+    StorageBuffer &StorageBuffer::update(const CommandPool &commandPool, const void *data, vk::DeviceSize size) {
         if (!mPhysicalDeviceMemoryProperties.has_value()) {
             throw std::runtime_error("mPhysicalDeviceMemoryProperties not set, must invoke StorageBuffer::physicalDeviceMemoryProperties()");
         }
