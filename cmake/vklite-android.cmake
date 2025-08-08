@@ -5,12 +5,6 @@ target_compile_definitions(${PROJECT_NAME}
         PUBLIC VKLITE_ANDROID ANDROID VK_USE_PLATFORM_ANDROID_KHR
 )
 
-# vulkan
-# https://www.vulkan.org/
-set(VULKAN_INSTALL_DIR D:/develop/vulkan/VulkanSDK/1.3.275.0)
-set(VULKAN_INCLUDE_DIR ${VULKAN_INSTALL_DIR}/Include)
-
-
 function(import_vulkan_header)
     set(VulkanHeadersPath "")
 

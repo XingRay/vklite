@@ -66,6 +66,8 @@ namespace vklite {
 
         CombinedImageSamplerBuilder &asDefault();
 
+        CombinedImageSamplerBuilder &asTexture();
+
         CombinedImageSamplerBuilder &asStorageImage();
     };
 

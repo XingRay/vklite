@@ -7,16 +7,13 @@
 #include "vklite/util/VulkanUtil.h"
 
 namespace vklite {
-
     CombinedImageSamplerBuilder::CombinedImageSamplerBuilder()
-            : mMemoryOffset(0) {
-        mImageBuilder.asTexture();
-        mImageViewBuilder.asDefault();
+        : mMemoryOffset(0) {
     }
 
     CombinedImageSamplerBuilder::~CombinedImageSamplerBuilder() = default;
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::device(vk::Device device) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::device(vk::Device device) {
         mDevice = device;
         mImageBuilder.device(device);
         mDeviceMemoryBuilder.device(device);
@@ -25,48 +22,48 @@ namespace vklite {
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::memoryOffset(vk::DeviceSize memoryOffset) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::memoryOffset(vk::DeviceSize memoryOffset) {
         mMemoryOffset = memoryOffset;
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::physicalDeviceMemoryProperties(vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::physicalDeviceMemoryProperties(vk::PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties) {
         mPhysicalDeviceMemoryProperties = physicalDeviceMemoryProperties;
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::memoryPropertyFlags(vk::MemoryPropertyFlags memoryPropertyFlags) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::memoryPropertyFlags(vk::MemoryPropertyFlags memoryPropertyFlags) {
         mMemoryPropertyFlags = memoryPropertyFlags;
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::width(uint32_t width) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::width(uint32_t width) {
         mImageBuilder.width(width);
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::height(uint32_t height) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::height(uint32_t height) {
         mImageBuilder.height(height);
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::size(uint32_t width, uint32_t height) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::size(uint32_t width, uint32_t height) {
         mImageBuilder.size(width, height);
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::size(vk::Extent2D size) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::size(vk::Extent2D size) {
         mImageBuilder.size(size);
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::format(vk::Format imageFormat) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::format(vk::Format imageFormat) {
         mImageBuilder.format(imageFormat);
         mImageViewBuilder.format(imageFormat);
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::sampleCount(vk::SampleCountFlagBits sampleCount) {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::sampleCount(vk::SampleCountFlagBits sampleCount) {
         mImageBuilder.sampleCount(sampleCount);
         return *this;
     }
@@ -119,18 +116,24 @@ namespace vklite {
         return samplers;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::asDefault() {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::asDefault() {
         (*this)
                 .memoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal);
 
         return *this;
     }
 
-    CombinedImageSamplerBuilder &CombinedImageSamplerBuilder::asStorageImage() {
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::asTexture() {
+        asDefault();
+        mImageBuilder.asTexture();
+        mImageViewBuilder.asTexture();
+        return *this;
+    }
+
+    CombinedImageSamplerBuilder& CombinedImageSamplerBuilder::asStorageImage() {
         asDefault();
         mImageBuilder.asStorageImage();
         mImageViewBuilder.asStorageImage();
         return *this;
     }
-
 } // vklite

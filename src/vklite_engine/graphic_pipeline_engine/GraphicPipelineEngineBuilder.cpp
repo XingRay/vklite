@@ -144,10 +144,10 @@ namespace vklite {
                 .config(physicalDevice->getVkPhysicalDevice(), surface->getVkSurface())
                 .buildUnique();
 
-        //        std::vector<vk::Viewport> viewports = swapchain->fullScreenViewports();
-        //        std::vector<vk::Rect2D> scissors = swapchain->fullScreenScissors();
-        std::vector<vk::Viewport> viewports = swapchain->centerSquareViewports();
-        std::vector<vk::Rect2D> scissors = swapchain->centerSquareScissors();
+        std::vector<vk::Viewport> viewports = swapchain->fullScreenViewports();
+        std::vector<vk::Rect2D> scissors = swapchain->fullScreenScissors();
+        // std::vector<vk::Viewport> viewports = swapchain->centerSquareViewports();
+        // std::vector<vk::Rect2D> scissors = swapchain->centerSquareScissors();
 
         std::unique_ptr<CommandPool> commandPool = CommandPoolBuilder()
                 .device(device->getVkDevice())
