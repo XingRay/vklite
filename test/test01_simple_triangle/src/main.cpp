@@ -3,10 +3,10 @@
 //
 
 #include <memory>
-#include "../../common/sandbox/Sandbox.h"
+#include "sandbox/Sandbox.h"
 #include "Test01.h"
 
-int main(int argc, const char **argv) {
+int main(int argc, const char** argv) {
     std::unique_ptr<test::TestBase> test = std::make_unique<test::Test01>();
     test::Sandbox sandbox(std::move(test));
     sandbox.run();

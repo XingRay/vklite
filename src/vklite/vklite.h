@@ -9,6 +9,7 @@
 #include "vklite/plugin/combined/CombinedPlugin.h"
 #include "vklite/plugin/debug/DebugPlugin.h"
 #include "vklite/plugin/surface/SurfacePlugin.h"
+#include "vklite/plugin/validation/ValidationPlugin.h"
 
 // instance
 #include "vklite/instance/Instance.h"

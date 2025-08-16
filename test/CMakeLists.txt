@@ -4,6 +4,9 @@ add_subdirectory(common)
 set(CURRENT_TEST_NAME "test01_simple_triangle")
 add_subdirectory(test01_simple_triangle)
 
+set(CURRENT_TEST_NAME "test02_single_color_triangle")
+add_subdirectory(test02_single_color_triangle)
+
 ## 自动添加测试
 #file(GLOB dirs
 #        *

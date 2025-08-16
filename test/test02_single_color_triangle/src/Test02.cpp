@@ -2,22 +2,22 @@
 // Created by leixing on 2025-07-12.
 //
 
-#include "Test01.h"
+#include "Test02.h"
 #include "FileUtil.h"
 
-namespace test {
+#include "vklite/vklite.h"
+#include "vklite/vklite_windows.h"
 
-    Test01::Test01() {
-        LOG_D("Test01::Test01()");
+namespace test {
+    Test02::Test02() {
+        LOG_D("Test02::Test02()");
     }
 
-    Test01::~Test01() = default;
+    Test02::~Test02() = default;
 
-    void Test01::init(GLFWwindow* window, int32_t width, int32_t height) {
-        LOG_D("Test01::init: window:%p, width:%d, height:%d", window, width, height);
-        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("shader/01_triangle.vert.spv");
-        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("shader/01_triangle.frag.spv");
-        LOG_D("vertexShaderCode.size:%zd, fragmentShaderCode.size:%zd", vertexShaderCode.size(), fragmentShaderCode.size());
+    void Test02::init(GLFWwindow* window, int32_t width, int32_t height) {
+        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("shader/02_triangle_color.vert.spv");
+        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("shader/02_triangle_color.frag.spv");
 
         vklite::ShaderConfigure shaderConfigure = vklite::ShaderConfigure()
                 .vertexShaderCode(std::move(vertexShaderCode))
@@ -27,6 +27,16 @@ namespace test {
                             .binding(0)
                             .stride(sizeof(Vertex))
                             .addAttribute(0, ShaderFormat::Vec3);
+                })
+                .addDescriptorSetConfigure([&](vklite::DescriptorSetConfigure& descriptorSetConfigure) {
+                    descriptorSetConfigure
+                            .set(0)
+                            .addUniformBuffer([&](vklite::UniformBufferConfigure& uniformConfigure) {
+                                uniformConfigure
+                                        .binding(0)
+                                        .descriptorCount(1)
+                                        .shaderStageFlags(vk::ShaderStageFlagBits::eVertex);
+                            });
                 });
 
         mInstance = vklite::InstanceBuilder()
@@ -122,8 +132,38 @@ namespace test {
                 .fenceCreateFlags(vk::FenceCreateFlagBits::eSignaled)
                 .build(mFrameCount);
 
+        std::vector<vk::PushConstantRange> pushConstantRanges = shaderConfigure.getPushConstantRanges();
+        mPushConstants.reserve(pushConstantRanges.size());
+        for (const vk::PushConstantRange& pushConstantRange: pushConstantRanges) {
+            mPushConstants.emplace_back(pushConstantRange.size, pushConstantRange.offset, pushConstantRange.stageFlags);
+        }
+
+        mDescriptorPool = vklite::DescriptorPoolBuilder()
+                .device((*mDevice).getVkDevice())
+                .frameCount(mFrameCount)
+                .descriptorPoolSizes(shaderConfigure.calcDescriptorPoolSizes())
+                .descriptorSetCount(shaderConfigure.getDescriptorSetCount())
+                .buildUnique();
+
+        mDescriptorSetLayouts = vklite::DescriptorSetLayoutsBuilder()
+                .device((*mDevice).getVkDevice())
+                .bindings(shaderConfigure.createDescriptorSetLayoutBindings())
+                .buildUnique();
+
+        mDescriptorSets.reserve(mFrameCount);
+        for (uint32_t i = 0; i < mFrameCount; i++) {
+            std::vector<vk::DescriptorSet> sets = (*mDescriptorPool).allocateDescriptorSets((*mDescriptorSetLayouts).getDescriptorSetLayouts());
+            LOG_D("descriptorPool->allocateDescriptorSets:");
+            for (const vk::DescriptorSet& set: sets) {
+                LOG_D("\tset:%p", (void *) set);
+            }
+            mDescriptorSets.push_back(std::move(sets));
+        }
+
         mPipelineLayout = vklite::PipelineLayoutBuilder()
                 .device((*mDevice).getVkDevice())
+                .descriptorSetLayouts((*mDescriptorSetLayouts).getDescriptorSetLayouts())
+                .pushConstantRanges(std::move(pushConstantRanges))
                 .buildUnique();
 
         std::unique_ptr<vklite::ShaderModule> vertexShader = vklite::ShaderModuleBuilder()
@@ -160,6 +200,8 @@ namespace test {
         std::vector<uint32_t> indices = {0, 1, 2};
         uint32_t indicesSize = indices.size() * sizeof(uint32_t);
 
+        ColorUniformBufferObject colorUniformBufferObject{{0.8f, 0.4f, 0.2f}};
+
         mIndexBuffer = vklite::IndexBufferBuilder()
                 .device((*mDevice).getVkDevice())
                 .physicalDeviceMemoryProperties((*mPhysicalDevice).getMemoryProperties())
@@ -170,7 +212,6 @@ namespace test {
         mIndexBufferOffset = 0;
         mIndexCount = indices.size();
 
-
         uint32_t verticesSize = vertices.size() * sizeof(Vertex);
         mVertexBuffer = vklite::VertexBufferBuilder()
                 .device(mDevice->getVkDevice())
@@ -180,15 +221,41 @@ namespace test {
         (*mVertexBuffer).update(*mCommandPool, vertices.data(), verticesSize);
         mVertexBuffers.push_back((*mVertexBuffer).getVkBuffer());
         mVertexBufferOffsets.push_back(0);
+
+        mUniformBuffers = vklite::UniformBufferBuilder()
+                .device(mDevice->getVkDevice())
+                .physicalDeviceMemoryProperties(mPhysicalDevice->getMemoryProperties())
+                .size(sizeof(ColorUniformBufferObject))
+                .build(mFrameCount);
+
+        for (uint32_t i = 0; i < mFrameCount; i++) {
+            mUniformBuffers[i].update(*mCommandPool, &colorUniformBufferObject, sizeof(ColorUniformBufferObject));
+        }
+
+
+        vklite::DescriptorSetWriters descriptorSetWriters = vklite::DescriptorSetWritersBuilder()
+                .frameCount(mFrameCount)
+                .descriptorSetMappingConfigure([&](uint32_t frameIndex, vklite::DescriptorSetMappingConfigure& configure) {
+                    configure
+                            .descriptorSet(mDescriptorSets[frameIndex][0])
+                            .addUniformBuffer([&](vklite::UniformBufferDescriptorMapping& mapping) {
+                                mapping
+                                        .addBufferInfo(mUniformBuffers[frameIndex].getBuffer());
+                            });
+                })
+                .build();
+
+        std::vector<vk::WriteDescriptorSet> writeDescriptorSets = descriptorSetWriters.createWriteDescriptorSets();
+        mDevice->getVkDevice().updateDescriptorSets(writeDescriptorSets, nullptr);
     }
 
-    void Test01::drawFrame() {
+    void Test02::drawFrame() {
         vklite::Semaphore& imageAvailableSemaphore = mImageAvailableSemaphores[mCurrentFrameIndex];
         vklite::Semaphore& renderFinishedSemaphore = mRenderFinishedSemaphores[mCurrentFrameIndex];
         vklite::Fence& fence = mFences[mCurrentFrameIndex];
         const vklite::PooledCommandBuffer& commandBuffer = (*mCommandBuffers)[mCurrentFrameIndex];
 
-        vk::Result result = fence.wait();
+        vk::Result result = mFences[mCurrentFrameIndex].wait();
         if (result != vk::Result::eSuccess) {
             LOG_E("waitForFences failed");
             throw std::runtime_error("waitForFences failed");
@@ -211,11 +278,24 @@ namespace test {
             }
         }
 
+
         commandBuffer.record([&](const vk::CommandBuffer& vkCommandBuffer_) {
             mRenderPass->execute(vkCommandBuffer_, mFramebuffers[imageIndex].getVkFramebuffer(), [&](const vk::CommandBuffer& vkCommandBuffer) {
                 vkCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, mPipeline->getVkPipeline());
                 vkCommandBuffer.setViewport(0, mViewports);
                 vkCommandBuffer.setScissor(0, mScissors);
+
+                if (!mDescriptorSets.empty()) {
+                    vkCommandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, mPipelineLayout->getVkPipelineLayout(), 0, mDescriptorSets[mCurrentFrameIndex], nullptr);
+                }
+
+                for (const vklite::PushConstant& pushConstant: mPushConstants) {
+                    vkCommandBuffer.pushConstants(mPipelineLayout->getVkPipelineLayout(),
+                                                  pushConstant.getStageFlags(),
+                                                  pushConstant.getOffset(),
+                                                  pushConstant.getSize(),
+                                                  pushConstant.getData());
+                }
 
                 vkCommandBuffer.bindVertexBuffers(0, mVertexBuffers, mVertexBufferOffsets);
                 vkCommandBuffer.bindIndexBuffer(mIndexVkBuffer, mIndexBufferOffset, vk::IndexType::eUint32);
@@ -223,7 +303,7 @@ namespace test {
             });
         });
 
-        result = fence.reset();
+        result = mFences[mCurrentFrameIndex].reset();
         if (result != vk::Result::eSuccess) {
             throw std::runtime_error("resetFences failed");
         }
@@ -250,9 +330,9 @@ namespace test {
         mCurrentFrameIndex = (mCurrentFrameIndex + 1) % mFrameCount;
     }
 
-    void Test01::cleanup() {
+    void Test02::cleanup() {
     }
 
-    void Test01::onWindowResized(int32_t width, int32_t height) {
+    void Test02::onWindowResized(int32_t width, int32_t height) {
     }
 } // test01

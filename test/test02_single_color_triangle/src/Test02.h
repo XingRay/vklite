@@ -12,7 +12,7 @@
 #include "glm.h"
 
 #include "vklite/vklite.h"
-#include "vklite/vklite_windows.h"
+#include "vklite/Log.h"
 
 
 namespace test {
@@ -20,7 +20,12 @@ namespace test {
         glm::vec3 pos;
     };
 
-    class Test01 : public TestBase {
+    struct ColorUniformBufferObject {
+        // 颜色数据
+        alignas(16) glm::vec3 color;
+    };
+
+    class Test02 : public TestBase {
     private:
         // config
         uint32_t mFrameCount = 2;
@@ -57,6 +62,10 @@ namespace test {
         std::vector<vklite::Fence> mFences;
 
         std::unique_ptr<vklite::PipelineLayout> mPipelineLayout;
+        std::unique_ptr<vklite::DescriptorPool> mDescriptorPool;
+        std::unique_ptr<vklite::DescriptorSetLayouts> mDescriptorSetLayouts;
+        std::vector<std::vector<vk::DescriptorSet> > mDescriptorSets;
+        std::vector<vklite::PushConstant> mPushConstants;
         std::unique_ptr<vklite::Pipeline> mPipeline;
 
         // vertex buffer
@@ -65,17 +74,18 @@ namespace test {
 
         // index buffer
         vk::Buffer mIndexVkBuffer;
-        uint32_t mIndexBufferOffset = 0;
+        uint32_t mIndexBufferOffset;
         uint32_t mIndexCount = 0;
 
         // resource
         std::unique_ptr<vklite::IndexBuffer> mIndexBuffer;
         std::unique_ptr<vklite::VertexBuffer> mVertexBuffer;
+        std::vector<vklite::UniformBuffer> mUniformBuffers;
 
     public:
-        Test01();
+        Test02();
 
-        ~Test01() override;
+        ~Test02() override;
 
         void init(GLFWwindow* window, int32_t width, int32_t height) override;
 
