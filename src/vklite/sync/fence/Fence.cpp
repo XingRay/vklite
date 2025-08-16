@@ -7,6 +7,8 @@
 #include <utility>
 #include <limits>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     Fence::Fence(vk::Device device, vk::Fence fence)
@@ -14,6 +16,7 @@ namespace vklite {
 
     Fence::~Fence() {
         if (mDevice != nullptr && mFence != nullptr) {
+            LOG_D("mDevice.destroy(mFence); mFence:%p", (void *) mFence);
             mDevice.destroy(mFence);
             mDevice = nullptr;
             mFence = nullptr;

@@ -16,6 +16,7 @@ namespace vklite {
 
     RenderPass::~RenderPass() {
         if (mDevice != nullptr && mRenderPass != nullptr) {
+            LOG_D("mDevice.destroy(mRenderPass); mRenderPass:%p", (void *) mRenderPass);
             mDevice.destroy(mRenderPass);
             mDevice = nullptr;
             mRenderPass = nullptr;

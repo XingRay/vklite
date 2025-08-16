@@ -42,7 +42,7 @@ namespace vklite {
 
     InstanceBuilder::~InstanceBuilder() = default;
 
-    InstanceBuilder::InstanceBuilder(InstanceBuilder &&other) noexcept
+    InstanceBuilder::InstanceBuilder(InstanceBuilder&& other) noexcept
         : mInstanceCreateInfo(other.mInstanceCreateInfo),
           mApplicationInfo(other.mApplicationInfo),
           mExtensions(std::move(other.mExtensions)),
@@ -51,7 +51,7 @@ namespace vklite {
         mInstanceCreateInfo.setPApplicationInfo(&mApplicationInfo);
     }
 
-    InstanceBuilder &InstanceBuilder::operator=(InstanceBuilder &&other) noexcept {
+    InstanceBuilder& InstanceBuilder::operator=(InstanceBuilder&& other) noexcept {
         if (this != &other) {
             mInstanceCreateInfo = other.mInstanceCreateInfo;
             mApplicationInfo = other.mApplicationInfo;
@@ -64,37 +64,37 @@ namespace vklite {
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::applicationName(const char *applicationName) {
+    InstanceBuilder& InstanceBuilder::applicationName(const char* applicationName) {
         mApplicationInfo.setPApplicationName(applicationName);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::applicationVersion(uint32_t applicationVersion) {
+    InstanceBuilder& InstanceBuilder::applicationVersion(uint32_t applicationVersion) {
         mApplicationInfo.setApplicationVersion(applicationVersion);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::engineName(const char *engineName) {
+    InstanceBuilder& InstanceBuilder::engineName(const char* engineName) {
         mApplicationInfo.setPEngineName(engineName);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::engineVersion(uint32_t engineVersion) {
+    InstanceBuilder& InstanceBuilder::engineVersion(uint32_t engineVersion) {
         mApplicationInfo.setEngineVersion(engineVersion);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::extensions(std::vector<const char *> &&extensions) {
+    InstanceBuilder& InstanceBuilder::extensions(std::vector<const char*>&& extensions) {
         mExtensions = std::move(extensions);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::layers(std::vector<const char *> &&layers) {
+    InstanceBuilder& InstanceBuilder::layers(std::vector<const char*>&& layers) {
         mEnableLayers = std::move(layers);
         return *this;
     }
 
-    InstanceBuilder &InstanceBuilder::addPlugin(std::unique_ptr<PluginInterface> plugin) {
+    InstanceBuilder& InstanceBuilder::addPlugin(std::unique_ptr<PluginInterface> plugin) {
         mPlugins.push_back(std::move(plugin));
         return *this;
     }
@@ -112,13 +112,13 @@ namespace vklite {
         //            LOG_D("\t%s ( version:%d )", extensionProperty.extensionName.data(), extensionProperty.specVersion);
         //        }
 
-        for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
-            std::vector<const char *> pluginExtensions = plugin->getInstanceExtensions();
+        for (const std::unique_ptr<PluginInterface>& plugin: mPlugins) {
+            std::vector<const char*> pluginExtensions = plugin->getInstanceExtensions();
             mExtensions.insert(mExtensions.begin(), std::move_iterator(pluginExtensions.begin()), std::move_iterator(pluginExtensions.end()));
         }
         mExtensions = CStringUtil::removeDuplicates(mExtensions);
         LOG_D("enabled instance extensions:[%zd]", mExtensions.size());
-        for (const auto &extensionName: mExtensions) {
+        for (const auto& extensionName: mExtensions) {
             LOG_D("  extensionName: %s", extensionName);
         }
         mInstanceCreateInfo.setPEnabledExtensionNames(mExtensions);
@@ -126,27 +126,27 @@ namespace vklite {
         // Available Layers
         std::vector<std::string> availableLayerNames = InstanceApi::enumerateInstanceLayerNames();
         LOG_D("Available Layers : [%zd]", availableLayerNames.size());
-        for (const auto &name: availableLayerNames) {
+        for (const auto& name: availableLayerNames) {
             LOG_D("  LayerName:  %s", name.c_str());
         }
 
         // plugin->getInstanceLayers
         LOG_D("mPlugins.size:%zd", mPlugins.size());
-        for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
-            std::vector<const char *> pluginLayers = plugin->getInstanceLayers();
+        for (const std::unique_ptr<PluginInterface>& plugin: mPlugins) {
+            std::vector<const char*> pluginLayers = plugin->getInstanceLayers();
             mEnableLayers.insert(mEnableLayers.begin(), std::move_iterator(pluginLayers.begin()), std::move_iterator(pluginLayers.end()));
         }
         mEnableLayers = CStringUtil::removeDuplicates(mEnableLayers);
         LOG_D("enabled layer names:[%zd]", mEnableLayers.size());
-        for (const auto &layerName: mEnableLayers) {
+        for (const auto& layerName: mEnableLayers) {
             LOG_D("  enabled layer name: %s", layerName);
         }
         mInstanceCreateInfo.setPEnabledLayerNames(mEnableLayers);
 
 
         // plugin->onPreCreateInstance
-        for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
-            plugin->onPreCreateInstance((vk::InstanceCreateInfo &) mInstanceCreateInfo);
+        for (const std::unique_ptr<PluginInterface>& plugin: mPlugins) {
+            plugin->onPreCreateInstance((vk::InstanceCreateInfo&) mInstanceCreateInfo);
         }
 
         LOG_D("InstanceApi::createInstance");
@@ -159,7 +159,7 @@ namespace vklite {
 
         Instance instance(vkInstance);
 
-        for (const std::unique_ptr<PluginInterface> &plugin: mPlugins) {
+        for (const std::unique_ptr<PluginInterface>& plugin: mPlugins) {
             plugin->onInstanceCreated(instance);
         }
 

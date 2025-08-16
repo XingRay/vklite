@@ -9,6 +9,7 @@
 #include "vklite/buffer/staging_buffer/StagingBuffer.h"
 #include "vklite/util/VulkanUtil.h"
 #include "vklite/sync/pipeline_barrier/PipelineBarrierBuilder.h"
+#include "vklite/Log.h"
 
 namespace vklite {
 
@@ -17,6 +18,7 @@ namespace vklite {
 
     Image::~Image() {
         if (mDevice != nullptr && mImage != nullptr) {
+            LOG_D("mDevice.destroy(mImage); mImage:%p", (void *) mImage);
             mDevice.destroy(mImage);
             mDevice = nullptr;
             mImage = nullptr;

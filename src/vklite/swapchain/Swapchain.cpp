@@ -16,6 +16,7 @@ namespace vklite {
 
     Swapchain::~Swapchain() {
         if (mDevice != nullptr && mSwapChain != nullptr) {
+            LOG_D("mDevice.destroy(mSwapChain); mSwapChain:%p", (void *) mSwapChain);
             mDevice.destroy(mSwapChain);
             mDevice = nullptr;
             mSwapChain = nullptr;

@@ -3,7 +3,10 @@
 //
 
 #include "CommandBuffer.h"
+
 #include <utility>
+
+#include "vklite/Log.h"
 
 namespace vklite {
 
@@ -12,6 +15,7 @@ namespace vklite {
 
     CommandBuffer::~CommandBuffer() {
         if (mDevice != nullptr && mCommandPool != nullptr && mCommandBuffer != nullptr) {
+            LOG_D("mDevice.freeCommandBuffers(mCommandPool, mCommandBuffer); mCommandBuffer:%p", (void *) mCommandBuffer);
             mDevice.freeCommandBuffers(mCommandPool, mCommandBuffer);
             mDevice = nullptr;
             mCommandPool = nullptr;

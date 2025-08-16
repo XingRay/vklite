@@ -4,24 +4,28 @@
 
 #include "Semaphore.h"
 
-namespace vklite {
+#include "vklite/Log.h"
 
+namespace vklite {
     Semaphore::Semaphore(vk::Device device, vk::Semaphore semaphore)
-            : mDevice(device), mSemaphore(semaphore) {}
+        : mDevice(device), mSemaphore(semaphore) {
+    }
 
     Semaphore::~Semaphore() {
         if (mDevice != nullptr && mSemaphore != nullptr) {
+            LOG_D("mDevice.destroy(mSemaphore); mSemaphore:%p", (void *) mSemaphore);
             mDevice.destroy(mSemaphore);
             mDevice = nullptr;
             mSemaphore = nullptr;
         }
     }
 
-    Semaphore::Semaphore(Semaphore &&other) noexcept
-            : mDevice(std::exchange(other.mDevice, nullptr)),
-              mSemaphore(std::exchange(other.mSemaphore, nullptr)) {}
+    Semaphore::Semaphore(Semaphore&& other) noexcept
+        : mDevice(std::exchange(other.mDevice, nullptr)),
+          mSemaphore(std::exchange(other.mSemaphore, nullptr)) {
+    }
 
-    Semaphore &Semaphore::operator=(Semaphore &&other) noexcept {
+    Semaphore& Semaphore::operator=(Semaphore&& other) noexcept {
         if (this != &other) {
             mDevice = std::exchange(other.mDevice, nullptr);
             mSemaphore = std::exchange(other.mSemaphore, nullptr);
@@ -29,8 +33,7 @@ namespace vklite {
         return *this;
     }
 
-    const vk::Semaphore &Semaphore::getVkSemaphore() const {
+    const vk::Semaphore& Semaphore::getVkSemaphore() const {
         return mSemaphore;
     }
-
 } // vklite

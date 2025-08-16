@@ -14,6 +14,7 @@ namespace vklite {
 
     ImageView::~ImageView() {
         if (mDevice != nullptr && mImageView != nullptr) {
+            LOG_D("mDevice.destroy(mImageView); mImageView:%p", (void *) mImageView);
             mDevice.destroy(mImageView);
             mDevice = nullptr;
             mImageView = nullptr;

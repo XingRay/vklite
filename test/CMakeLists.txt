@@ -1,24 +1,23 @@
 # 添加测试用例的公共依赖
 add_subdirectory(common)
-add_subdirectory(math)
-add_subdirectory(util)
-add_subdirectory(image)
-add_subdirectory(model)
 
-# 自动添加测试
-file(GLOB dirs
-        *
-)
-message("test dirs:${dirs}")
+set(CURRENT_TEST_NAME "test01_simple_triangle")
+add_subdirectory(test01_simple_triangle)
 
-# 添加所有测试用例
-foreach (dir_PATH IN LISTS dirs)
-    message("dir_PATH:${dir_PATH}")
-    get_filename_component(dir_NAME ${dir_PATH} NAME)
-    message("dir_NAME:${dir_NAME}")
-    if (IS_DIRECTORY ${dir_PATH} AND (${dir_NAME} MATCHES "^test"))
-        message("test dir_NAME:${dir_NAME}")
-        set(CURRENT_TEST_NAME ${dir_NAME})
-        add_subdirectory(${dir_PATH})
-    endif ()
-endforeach ()
+## 自动添加测试
+#file(GLOB dirs
+#        *
+#)
+#message("test dirs:${dirs}")
+#
+## 添加所有测试用例
+#foreach (dir_PATH IN LISTS dirs)
+#    message("dir_PATH:${dir_PATH}")
+#    get_filename_component(dir_NAME ${dir_PATH} NAME)
+#    message("dir_NAME:${dir_NAME}")
+#    if (IS_DIRECTORY ${dir_PATH} AND (${dir_NAME} MATCHES "^test"))
+#        message("test dir_NAME:${dir_NAME}")
+#        set(CURRENT_TEST_NAME ${dir_NAME})
+#        add_subdirectory(${dir_PATH})
+#    endif ()
+#endforeach ()

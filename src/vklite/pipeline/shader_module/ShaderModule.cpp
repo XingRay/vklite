@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     ShaderModule::ShaderModule(vk::Device device, vk::ShaderModule shaderModule)
@@ -13,6 +15,7 @@ namespace vklite {
 
     ShaderModule::~ShaderModule() {
         if (mDevice != nullptr && mShaderModule != nullptr) {
+            LOG_D("mDevice.destroy(mShaderModule); mShaderModule:%p", (void *) mShaderModule);
             mDevice.destroy(mShaderModule);
             mDevice = nullptr;
             mShaderModule = nullptr;

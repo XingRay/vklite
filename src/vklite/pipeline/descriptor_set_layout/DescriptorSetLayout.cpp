@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     DescriptorSetLayout::DescriptorSetLayout(vk::Device device, vk::DescriptorSetLayout descriptorSetLayout)
@@ -13,6 +15,7 @@ namespace vklite {
 
     DescriptorSetLayout::~DescriptorSetLayout() {
         if (mDevice != nullptr && mDescriptorSetLayout != nullptr) {
+            LOG_D("mDevice.destroy(mDescriptorSetLayout); mDescriptorSetLayout:%p", (void *) mDescriptorSetLayout);
             mDevice.destroy(mDescriptorSetLayout);
         }
     }

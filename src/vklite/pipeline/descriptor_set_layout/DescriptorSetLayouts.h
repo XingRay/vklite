@@ -9,27 +9,31 @@
 #include <vulkan/vulkan.hpp>
 
 namespace vklite {
-
     class DescriptorSetLayouts {
     private:
         vk::Device mDevice;
         std::vector<vk::DescriptorSetLayout> mDescriptorSetLayouts;
 
     public:
-        explicit DescriptorSetLayouts(vk::Device device, std::vector<vk::DescriptorSetLayout> &&descriptorSetLayouts);
+        explicit DescriptorSetLayouts(vk::Device device, std::vector<vk::DescriptorSetLayout>&& descriptorSetLayouts);
 
         ~DescriptorSetLayouts();
 
-        DescriptorSetLayouts(const DescriptorSetLayouts &other) = delete;
+        DescriptorSetLayouts(const DescriptorSetLayouts& other) = delete;
 
-        DescriptorSetLayouts &operator=(const DescriptorSetLayouts &other) = delete;
+        DescriptorSetLayouts& operator=(const DescriptorSetLayouts& other) = delete;
 
-        DescriptorSetLayouts(DescriptorSetLayouts &&other) noexcept;
+        DescriptorSetLayouts(DescriptorSetLayouts&& other) noexcept;
 
-        DescriptorSetLayouts &operator=(DescriptorSetLayouts &&other) noexcept;
+        DescriptorSetLayouts& operator=(DescriptorSetLayouts&& other) noexcept;
 
         [[nodiscard]]
-        const std::vector<vk::DescriptorSetLayout> &getDescriptorSetLayouts() const;
-    };
+        const std::vector<vk::DescriptorSetLayout>& getDescriptorSetLayouts() const;
 
+        [[nodiscard]]
+        uint32_t size() const;
+
+        [[nodiscard]]
+        uint32_t size();
+    };
 } // vklite

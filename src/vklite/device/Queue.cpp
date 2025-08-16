@@ -15,37 +15,37 @@ namespace vklite {
 
     Queue::~Queue() = default;
 
-    Queue::Queue(Queue &&other) noexcept
+    Queue::Queue(Queue&& other) noexcept
         : mQueue(std::exchange(other.mQueue, nullptr)) {
     }
 
-    Queue &Queue::operator=(Queue &&other) noexcept {
+    Queue& Queue::operator=(Queue&& other) noexcept {
         if (this != &other) {
             mQueue = std::exchange(other.mQueue, nullptr);
         }
         return *this;
     }
 
-    const vk::Queue &Queue::getVkQueue() const {
+    const vk::Queue& Queue::getVkQueue() const {
         return mQueue;
     }
 
-    vk::Result Queue::present(const vk::SwapchainKHR &swapchain, uint32_t imageIndex, const vk::Semaphore &waitSemaphore) const {
+    vk::Result Queue::present(const vk::SwapchainKHR& swapchain, uint32_t imageIndex, const vk::Semaphore& waitSemaphore) const {
         std::array<vk::SwapchainKHR, 1> swapChains = {swapchain};
         std::array<uint32_t, 1> imageIndices = {imageIndex};
-        std::array<vk::Semaphore, 1> signalSemaphores = {waitSemaphore};
+        std::array<vk::Semaphore, 1> waitSemaphores = {waitSemaphore};
         vk::PresentInfoKHR presentInfo{};
         presentInfo
-                .setWaitSemaphores(signalSemaphores)
                 .setSwapchains(swapChains)
-                .setImageIndices(imageIndices);
+                .setImageIndices(imageIndices)
+                .setWaitSemaphores(waitSemaphores);
 
         vk::Result result;
         // https://github.com/KhronosGroup/Vulkan-Hpp/issues/599
         // 当出现图片不匹配时， cpp风格的 presentKHR 会抛出异常， 而不是返回 result， 而C风格的 presentKHR 接口会返回 result
         try {
             result = mQueue.presentKHR(presentInfo);
-        } catch (const vk::OutOfDateKHRError &e) {
+        } catch (const vk::OutOfDateKHRError& e) {
             LOG_E("error: %s", e.what());
             result = vk::Result::eErrorOutOfDateKHR;
         }
@@ -53,7 +53,7 @@ namespace vklite {
         return result;
     }
 
-    void Queue::submit(const vk::CommandBuffer &commandBuffer, const vk::Semaphore &signalSemaphore, const vk::Fence &fence) const {
+    void Queue::submit(const vk::CommandBuffer& commandBuffer, const vk::Semaphore& signalSemaphore, const vk::Fence& fence) const {
         std::array<vk::CommandBuffer, 1> commandBuffers = {commandBuffer};
         std::array<vk::Semaphore, 1> semaphores = {signalSemaphore};
 
@@ -67,8 +67,8 @@ namespace vklite {
         mQueue.submit(submitInfos, fence);
     }
 
-    void Queue::submit(const vk::CommandBuffer &commandBuffer, vk::PipelineStageFlags waitStage, const vk::Semaphore &waitSemaphore,
-                       const vk::Semaphore &signalSemaphore, const vk::Fence &fence) const {
+    void Queue::submit(const vk::CommandBuffer& commandBuffer, vk::PipelineStageFlags waitStage, const vk::Semaphore& waitSemaphore,
+                       const vk::Semaphore& signalSemaphore, const vk::Fence& fence) const {
         std::array<vk::CommandBuffer, 1> commandBuffers = {commandBuffer};
         std::array<vk::PipelineStageFlags, 1> waitStages = {waitStage};
         std::array<vk::Semaphore, 1> waitSemaphores = {waitSemaphore};
@@ -86,7 +86,7 @@ namespace vklite {
         mQueue.submit(submitInfos, fence);
     }
 
-    void Queue::submit(const vk::CommandBuffer &commandBuffer) const {
+    void Queue::submit(const vk::CommandBuffer& commandBuffer) const {
         vk::SubmitInfo submitInfo{};
         submitInfo
                 .setCommandBufferCount(1)

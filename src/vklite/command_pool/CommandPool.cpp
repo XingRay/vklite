@@ -14,6 +14,7 @@ namespace vklite {
 
     CommandPool::~CommandPool() {
         if (mDevice != nullptr && mCommandPool != nullptr) {
+            LOG_D("mDevice.destroy(mCommandPool); mCommandPool:%p", (void *) mCommandPool);
             mDevice.destroy(mCommandPool);
             mDevice = nullptr;
             mCommandPool = nullptr;

@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "vklite/util/VulkanUtil.h"
+#include "vklite/Log.h"
 
 namespace vklite {
 
@@ -15,6 +16,7 @@ namespace vklite {
 
     Sampler::~Sampler() {
         if (mDevice != nullptr && mSampler != nullptr) {
+            LOG_D("mDevice.destroy(mSampler); mSampler:%p", (void *) mSampler);
             mDevice.destroy(mSampler);
             mDevice = nullptr;
             mSampler = nullptr;

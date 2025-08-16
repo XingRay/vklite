@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     Surface::Surface(vk::Instance instance, vk::SurfaceKHR surface)
@@ -13,6 +15,7 @@ namespace vklite {
 
     Surface::~Surface() {
         if (mInstance != nullptr && mSurface != nullptr) {
+            LOG_D("mInstance.destroy(mSurface); mSurface:%p", (void *) mSurface);
             mInstance.destroy(mSurface);
             mInstance = nullptr;
             mSurface = nullptr;

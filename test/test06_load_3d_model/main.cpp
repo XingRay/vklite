@@ -3,7 +3,7 @@
 //
 
 #include <memory>
-#include "Sandbox.h"
+#include "../common/sandbox/Sandbox.h"
 #include "Test06.h"
 
 int main(int argc, const char **argv) {

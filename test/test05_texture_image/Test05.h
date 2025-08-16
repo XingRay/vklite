@@ -8,7 +8,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "TestBase.h"
+#include "../common/sandbox/TestBase.h"
 #include "glm.h"
 #include "Timer.h"
 

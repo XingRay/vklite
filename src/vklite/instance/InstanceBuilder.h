@@ -31,49 +31,46 @@
 #endif
 
 namespace vklite {
-
     class InstanceBuilder {
     private:
         vk::InstanceCreateInfo mInstanceCreateInfo;
         vk::ApplicationInfo mApplicationInfo;
 
-        std::vector<const char *> mExtensions;
-        std::vector<const char *> mEnableLayers;
+        std::vector<const char*> mExtensions;
+        std::vector<const char*> mEnableLayers;
 
-        std::vector<std::unique_ptr<PluginInterface>> mPlugins;
+        std::vector<std::unique_ptr<PluginInterface> > mPlugins;
 
     public:
-
         InstanceBuilder();
 
         ~InstanceBuilder();
 
-        InstanceBuilder(const InstanceBuilder &other) = delete;
+        InstanceBuilder(const InstanceBuilder& other) = delete;
 
-        InstanceBuilder &operator=(const InstanceBuilder &other) = delete;
+        InstanceBuilder& operator=(const InstanceBuilder& other) = delete;
 
-        InstanceBuilder(InstanceBuilder &&other) noexcept;
+        InstanceBuilder(InstanceBuilder&& other) noexcept;
 
-        InstanceBuilder &operator=(InstanceBuilder &&other) noexcept;
+        InstanceBuilder& operator=(InstanceBuilder&& other) noexcept;
 
-        InstanceBuilder &applicationName(const char *applicationName);
+        InstanceBuilder& applicationName(const char* applicationName);
 
-        InstanceBuilder &applicationVersion(uint32_t applicationVersion);
+        InstanceBuilder& applicationVersion(uint32_t applicationVersion);
 
-        InstanceBuilder &engineName(const char *engineName);
+        InstanceBuilder& engineName(const char* engineName);
 
-        InstanceBuilder &engineVersion(uint32_t engineVersion);
+        InstanceBuilder& engineVersion(uint32_t engineVersion);
 
-        InstanceBuilder &extensions(std::vector<const char *> &&extensions);
+        InstanceBuilder& extensions(std::vector<const char*>&& extensions);
 
-        InstanceBuilder &layers(std::vector<const char *> &&layers);
+        InstanceBuilder& layers(std::vector<const char*>&& layers);
 
-        InstanceBuilder &addPlugin(std::unique_ptr<PluginInterface> plugin);
+        InstanceBuilder& addPlugin(std::unique_ptr<PluginInterface> plugin);
 
         // build
         Instance build();
 
         std::unique_ptr<Instance> buildUnique();
     };
-
 } // vklite

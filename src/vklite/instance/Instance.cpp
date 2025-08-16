@@ -24,6 +24,7 @@ namespace vklite {
 
     Instance::~Instance() {
         if (mInstance != nullptr) {
+            LOG_D("mInstance.destroy(); mInstance:%p", (void *) mInstance);
             mInstance.destroy();
             mInstance = nullptr;
         }

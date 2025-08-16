@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     Pipeline::Pipeline(vk::Device device, vk::Pipeline pipeline)
@@ -13,6 +15,7 @@ namespace vklite {
 
     Pipeline::~Pipeline() {
         if (mDevice != nullptr && mPipeline != nullptr) {
+            LOG_D("mDevice.destroy(mPipeline); mPipeline:%p", (void *) mPipeline);
             mDevice.destroy(mPipeline);
             mDevice = nullptr;
             mPipeline = nullptr;

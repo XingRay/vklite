@@ -31,7 +31,7 @@ foreach (SPV_FILE ${SPV_FILES})
     )
 endforeach ()
 
-set(TEST_IMAGES "${PROJECT_SOURCE_DIR}/test/resource/image/01.jpg")
+set(TEST_IMAGES "resource/image/01.jpg")
 foreach (IMAGE_FILE ${TEST_IMAGES})
     get_filename_component(IMAGE_FILE_NAME ${IMAGE_FILE} NAME)
     add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD

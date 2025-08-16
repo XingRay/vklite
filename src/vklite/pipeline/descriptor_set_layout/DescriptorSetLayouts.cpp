@@ -9,14 +9,14 @@
 #include "vklite/Log.h"
 
 namespace vklite {
-
-    DescriptorSetLayouts::DescriptorSetLayouts(vk::Device device, std::vector<vk::DescriptorSetLayout> &&descriptorSetLayouts)
-            : mDevice(device),
-              mDescriptorSetLayouts(std::move(descriptorSetLayouts)) {}
+    DescriptorSetLayouts::DescriptorSetLayouts(vk::Device device, std::vector<vk::DescriptorSetLayout>&& descriptorSetLayouts)
+        : mDevice(device),
+          mDescriptorSetLayouts(std::move(descriptorSetLayouts)) {
+    }
 
     DescriptorSetLayouts::~DescriptorSetLayouts() {
         if (mDevice != nullptr && !mDescriptorSetLayouts.empty()) {
-            for (const vk::DescriptorSetLayout &descriptorSetLayout: mDescriptorSetLayouts) {
+            for (const vk::DescriptorSetLayout& descriptorSetLayout: mDescriptorSetLayouts) {
                 LOG_D("mDevice.destroy(descriptorSetLayout), descriptorSetLayout:%p", (void *) descriptorSetLayout);
                 mDevice.destroy(descriptorSetLayout);
             }
@@ -25,11 +25,12 @@ namespace vklite {
         }
     }
 
-    DescriptorSetLayouts::DescriptorSetLayouts(DescriptorSetLayouts &&other) noexcept
-            : mDevice(std::exchange(other.mDevice, nullptr)),
-              mDescriptorSetLayouts(std::move(other.mDescriptorSetLayouts)) {}
+    DescriptorSetLayouts::DescriptorSetLayouts(DescriptorSetLayouts&& other) noexcept
+        : mDevice(std::exchange(other.mDevice, nullptr)),
+          mDescriptorSetLayouts(std::move(other.mDescriptorSetLayouts)) {
+    }
 
-    DescriptorSetLayouts &DescriptorSetLayouts::operator=(DescriptorSetLayouts &&other) noexcept {
+    DescriptorSetLayouts& DescriptorSetLayouts::operator=(DescriptorSetLayouts&& other) noexcept {
         if (this != &other) {
             mDevice = std::exchange(other.mDevice, nullptr);
             mDescriptorSetLayouts = std::move(other.mDescriptorSetLayouts);
@@ -37,8 +38,15 @@ namespace vklite {
         return *this;
     }
 
-    const std::vector<vk::DescriptorSetLayout> &DescriptorSetLayouts::getDescriptorSetLayouts() const {
+    const std::vector<vk::DescriptorSetLayout>& DescriptorSetLayouts::getDescriptorSetLayouts() const {
         return mDescriptorSetLayouts;
     }
 
+    uint32_t DescriptorSetLayouts::size() const {
+        return mDescriptorSetLayouts.size();
+    }
+
+    uint32_t DescriptorSetLayouts::size() {
+        return mDescriptorSetLayouts.size();
+    }
 } // vklite

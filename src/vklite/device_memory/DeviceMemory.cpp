@@ -7,6 +7,8 @@
 #include <utility>
 #include <format>
 
+#include "vklite/Log.h"
+
 namespace vklite {
 
     DeviceMemory::DeviceMemory(const vk::Device &device, const vk::DeviceMemory &deviceMemory, DeviceMemoryMeta &&meta)
@@ -14,6 +16,7 @@ namespace vklite {
 
     DeviceMemory::~DeviceMemory() {
         if (mDevice != nullptr && mDeviceMemory != nullptr) {
+            LOG_D("mDevice.free(mDeviceMemory); mDeviceMemory:%p", (void *) mDeviceMemory);
             mDevice.free(mDeviceMemory);
             mDevice = nullptr;
             mDeviceMemory = nullptr;

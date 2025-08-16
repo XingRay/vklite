@@ -16,6 +16,7 @@ namespace vklite {
             : mPhysicalDevice(physicalDevice) {}
 
     PhysicalDevice::~PhysicalDevice() {
+        LOG_D("PhysicalDevice::~PhysicalDevice() mPhysicalDevice:%p", (void *) mPhysicalDevice);
         mPhysicalDevice = nullptr;
     }
 

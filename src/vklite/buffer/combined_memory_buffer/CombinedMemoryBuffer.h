@@ -8,33 +8,31 @@
 #include "vklite/device_memory/DeviceMemory.h"
 
 namespace vklite {
-
     class CombinedMemoryBuffer {
     private:
-        Buffer mBuffer;
         DeviceMemory mDeviceMemory;
+        Buffer mBuffer;
 
     public:
-        explicit CombinedMemoryBuffer(Buffer &&buffer, DeviceMemory &&deviceMemory);
+        explicit CombinedMemoryBuffer(Buffer&& buffer, DeviceMemory&& deviceMemory);
 
         ~CombinedMemoryBuffer();
 
-        CombinedMemoryBuffer(const CombinedMemoryBuffer &other) = delete;
+        CombinedMemoryBuffer(const CombinedMemoryBuffer& other) = delete;
 
-        CombinedMemoryBuffer &operator=(const CombinedMemoryBuffer &other) = delete;
+        CombinedMemoryBuffer& operator=(const CombinedMemoryBuffer& other) = delete;
 
-        CombinedMemoryBuffer(CombinedMemoryBuffer &&other) noexcept;
+        CombinedMemoryBuffer(CombinedMemoryBuffer&& other) noexcept;
 
-        CombinedMemoryBuffer &operator=(CombinedMemoryBuffer &&other) noexcept;
-
-        [[nodiscard]]
-        const Buffer &getBuffer() const;
+        CombinedMemoryBuffer& operator=(CombinedMemoryBuffer&& other) noexcept;
 
         [[nodiscard]]
-        const vk::Buffer &getVkBuffer() const;
+        const Buffer& getBuffer() const;
 
         [[nodiscard]]
-        const DeviceMemory &getDeviceMemory() const;
+        const vk::Buffer& getVkBuffer() const;
+
+        [[nodiscard]]
+        const DeviceMemory& getDeviceMemory() const;
     };
-
 } // vklite

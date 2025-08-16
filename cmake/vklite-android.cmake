@@ -5,7 +5,7 @@ target_compile_definitions(${PROJECT_NAME}
         PUBLIC VKLITE_ANDROID ANDROID VK_USE_PLATFORM_ANDROID_KHR
 )
 
-function(import_vulkan_header)
+function(import_vulkan_headers)
     set(VulkanHeadersPath "")
 
     if (IS_DIRECTORY ${VULKAN_HEADERS_PATH})

@@ -13,6 +13,7 @@ namespace vklite {
 
     Framebuffer::~Framebuffer() {
         if (mDevice != nullptr && mFramebuffer != nullptr) {
+            LOG_D("mDevice.destroy(mFramebuffer); mFramebuffer:%p", (void *) mFramebuffer);
             mDevice.destroy(mFramebuffer);
             mDevice = nullptr;
             mFramebuffer = nullptr;
