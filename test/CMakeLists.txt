@@ -13,6 +13,9 @@ add_subdirectory(test03_colored_triangle)
 set(CURRENT_TEST_NAME "test04_mvp_matrix")
 add_subdirectory(test04_mvp_matrix)
 
+set(CURRENT_TEST_NAME "test05_texture_image")
+add_subdirectory(test05_texture_image)
+
 ## 自动添加测试
 #file(GLOB dirs
 #        *

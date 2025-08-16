@@ -20,4 +20,4 @@ target_link_libraries(${CURRENT_TEST_NAME}
 )
 
 include("../../cmake/compile_copy_shader.cmake")
-compile_copy_shader("shader" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/shader")
+compile_copy_shader(${CURRENT_TEST_NAME} "shader" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/shader")

@@ -16,27 +16,22 @@ add_executable(${CURRENT_TEST_NAME}
 )
 
 target_link_libraries(${CURRENT_TEST_NAME}
-        PRIVATE vklite test_common math util image
+        PRIVATE vklite sandbox math util image
 )
 
-file(GLOB SPV_FILES
-        "${PROJECT_SOURCE_DIR}/test/spv/05_*.spv"
-)
-foreach (SPV_FILE ${SPV_FILES})
-    get_filename_component(SPV_FILE_NAME ${SPV_FILE} NAME)
-    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${SPV_FILE}"
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/spv/${SPV_FILE_NAME}"
-    )
-endforeach ()
 
-set(TEST_IMAGES "resource/image/01.jpg")
-foreach (IMAGE_FILE ${TEST_IMAGES})
-    get_filename_component(IMAGE_FILE_NAME ${IMAGE_FILE} NAME)
-    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${IMAGE_FILE}"
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/image/${IMAGE_FILE_NAME}"
-    )
-endforeach ()
+include("../../cmake/compile_copy_shader.cmake")
+compile_copy_shader(${CURRENT_TEST_NAME} "shader" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/shader")
+
+include("../../cmake/utils.cmake")
+copyDirToTargetDir(${CURRENT_TEST_NAME} "resource" "resource")
+
+#set(TEST_IMAGES "resource/image/01.jpg")
+#foreach (IMAGE_FILE ${TEST_IMAGES})
+#    get_filename_component(IMAGE_FILE_NAME ${IMAGE_FILE} NAME)
+#    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E copy
+#            "${IMAGE_FILE}"
+#            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/image/${IMAGE_FILE_NAME}"
+#    )
+#endforeach ()
