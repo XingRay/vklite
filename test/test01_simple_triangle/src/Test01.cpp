@@ -6,7 +6,6 @@
 #include "FileUtil.h"
 
 namespace test {
-
     Test01::Test01() {
         LOG_D("Test01::Test01()");
     }
@@ -251,6 +250,10 @@ namespace test {
     }
 
     void Test01::cleanup() {
+        vk::Device device = (*mDevice).getVkDevice();
+        if (device != nullptr) {
+            device.waitIdle();
+        }
     }
 
     void Test01::onWindowResized(int32_t width, int32_t height) {

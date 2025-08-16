@@ -2,22 +2,22 @@
 // Created by leixing on 2025-07-12.
 //
 
-#include "Test02.h"
+#include "Test03.h"
 #include "FileUtil.h"
 
-#include "vklite/vklite.h"
-#include "vklite/vklite_windows.h"
+#include <numbers>
+#include <cmath>
 
 namespace test {
-    Test02::Test02() {
-        LOG_D("Test02::Test02()");
+    Test03::Test03() {
+        LOG_D("Test03::Test03()");
     }
 
-    Test02::~Test02() = default;
+    Test03::~Test03() = default;
 
-    void Test02::init(GLFWwindow* window, int32_t width, int32_t height) {
-        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("shader/02_triangle_color.vert.spv");
-        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("shader/02_triangle_color.frag.spv");
+    void Test03::init(GLFWwindow* window, int32_t width, int32_t height) {
+        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("shader/03_colored_triangle.vert.spv");
+        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("shader/03_colored_triangle.frag.spv");
 
         vklite::ShaderConfigure shaderConfigure = vklite::ShaderConfigure()
                 .vertexShaderCode(std::move(vertexShaderCode))
@@ -26,18 +26,10 @@ namespace test {
                     vertexBindingConfigure
                             .binding(0)
                             .stride(sizeof(Vertex))
-                            .addAttribute(0, ShaderFormat::Vec3);
-                })
-                .addDescriptorSetConfigure([&](vklite::DescriptorSetConfigure& descriptorSetConfigure) {
-                    descriptorSetConfigure
-                            .set(0)
-                            .addUniformBuffer([&](vklite::UniformBufferConfigure& uniformConfigure) {
-                                uniformConfigure
-                                        .binding(0)
-                                        .descriptorCount(1)
-                                        .shaderStageFlags(vk::ShaderStageFlagBits::eVertex);
-                            });
+                            .addAttribute(0, ShaderFormat::Vec3)
+                            .addAttribute(1, ShaderFormat::Vec3);
                 });
+
 
         mInstance = vklite::InstanceBuilder()
                 .addPlugin(vklite::SurfacePlugin::buildUnique())
@@ -191,16 +183,60 @@ namespace test {
                 .buildUnique();
 
 
-        std::vector<Vertex> vertices = {
-            {{1.0f, -1.0f, 0.0f}},
-            {{-1.0f, -1.0f, 0.0f}},
-            {{0.0f, 1.0f, 0.0f}},
-        };
 
-        std::vector<uint32_t> indices = {0, 1, 2};
+        // 六边形
+        double r = 0.8;
+        const int numVertices = 6;
+        std::vector<Vertex> vertices;
+
+        // 中心点
+        vertices.push_back({
+            {0.0f, 0.0f, 0.0f}, // 坐标
+            {1.0f, 1.0f, 1.0f} // 颜色
+        });
+        std::vector<glm::vec3> colors = {
+            {1.0f, 0.0f, 0.0f},
+            {1.0f, 1.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f},
+            {0.0f, 1.0f, 1.0f},
+            {0.0f, 0.0f, 1.0f},
+            {1.0f, 0.0f, 1.0f},
+        };
+        for (int i = 0; i < numVertices; ++i) {
+            // 1. 计算角度（度 → 弧度）
+            double angle_deg = i * 60.0; // 逆时针旋转60° × i
+            double angle_rad = angle_deg * std::numbers::pi / 180.0; // 转为弧度
+
+            // 2. 计算坐标
+            double x = r * std::cos(angle_rad);
+            double y = r * std::sin(angle_rad);
+
+            // 4. 添加到顶点列表
+            vertices.push_back({
+                {static_cast<float>(x), static_cast<float>(y), 0.0f},
+                colors[i]
+            });
+        }
+
+        std::vector<uint32_t> indices = {
+            0, 2, 1,
+            0, 3, 2,
+            0, 4, 3,
+            0, 5, 4,
+            0, 6, 5,
+            0, 1, 6,
+        };
         uint32_t indicesSize = indices.size() * sizeof(uint32_t);
 
-        ColorUniformBufferObject colorUniformBufferObject{{0.8f, 0.4f, 0.2f}};
+        // triangle
+        // std::vector<Vertex> vertices = {
+        //     {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        //     {{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        //     {{0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+        // };
+        //
+        // std::vector<uint32_t> indices = {0, 1, 2};
+
 
         mIndexBuffer = vklite::IndexBufferBuilder()
                 .device((*mDevice).getVkDevice())
@@ -222,34 +258,9 @@ namespace test {
         mVertexBuffers.push_back((*mVertexBuffer).getVkBuffer());
         mVertexBufferOffsets.push_back(0);
 
-        mUniformBuffers = vklite::UniformBufferBuilder()
-                .device(mDevice->getVkDevice())
-                .physicalDeviceMemoryProperties(mPhysicalDevice->getMemoryProperties())
-                .size(sizeof(ColorUniformBufferObject))
-                .build(mFrameCount);
-
-        for (uint32_t i = 0; i < mFrameCount; i++) {
-            mUniformBuffers[i].update(*mCommandPool, &colorUniformBufferObject, sizeof(ColorUniformBufferObject));
-        }
-
-
-        vklite::DescriptorSetWriters descriptorSetWriters = vklite::DescriptorSetWritersBuilder()
-                .frameCount(mFrameCount)
-                .descriptorSetMappingConfigure([&](uint32_t frameIndex, vklite::DescriptorSetMappingConfigure& configure) {
-                    configure
-                            .descriptorSet(mDescriptorSets[frameIndex][0])
-                            .addUniformBuffer([&](vklite::UniformBufferDescriptorMapping& mapping) {
-                                mapping
-                                        .addBufferInfo(mUniformBuffers[frameIndex].getBuffer());
-                            });
-                })
-                .build();
-
-        std::vector<vk::WriteDescriptorSet> writeDescriptorSets = descriptorSetWriters.createWriteDescriptorSets();
-        mDevice->getVkDevice().updateDescriptorSets(writeDescriptorSets, nullptr);
     }
 
-    void Test02::drawFrame() {
+    void Test03::drawFrame() {
         vklite::Semaphore& imageAvailableSemaphore = mImageAvailableSemaphores[mCurrentFrameIndex];
         vklite::Semaphore& renderFinishedSemaphore = mRenderFinishedSemaphores[mCurrentFrameIndex];
         vklite::Fence& fence = mFences[mCurrentFrameIndex];
@@ -330,13 +341,13 @@ namespace test {
         mCurrentFrameIndex = (mCurrentFrameIndex + 1) % mFrameCount;
     }
 
-    void Test02::cleanup() {
+    void Test03::cleanup() {
         vk::Device device = (*mDevice).getVkDevice();
         if (device != nullptr) {
             device.waitIdle();
         }
     }
 
-    void Test02::onWindowResized(int32_t width, int32_t height) {
+    void Test03::onWindowResized(int32_t width, int32_t height) {
     }
 } // test01

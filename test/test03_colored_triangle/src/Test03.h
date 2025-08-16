@@ -12,12 +12,13 @@
 #include "glm.h"
 
 #include "vklite/vklite.h"
+#include "vklite/vklite_windows.h"
 #include "vklite/Log.h"
-
 
 namespace test {
     struct Vertex {
-        glm::vec3 pos;
+        glm::vec3 position;
+        glm::vec3 color;
     };
 
     struct ColorUniformBufferObject {
@@ -25,7 +26,7 @@ namespace test {
         alignas(16) glm::vec3 color;
     };
 
-    class Test02 : public TestBase {
+    class Test03 : public TestBase {
     private:
         // config
         uint32_t mFrameCount = 2;
@@ -83,9 +84,9 @@ namespace test {
         std::vector<vklite::UniformBuffer> mUniformBuffers;
 
     public:
-        Test02();
+        Test03();
 
-        ~Test02() override;
+        ~Test03() override;
 
         void init(GLFWwindow* window, int32_t width, int32_t height) override;
 
