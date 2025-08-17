@@ -16,7 +16,7 @@ namespace vklite {
 
     DeviceMemory::~DeviceMemory() {
         if (mDevice != nullptr && mDeviceMemory != nullptr) {
-            LOG_D("mDevice.free(mDeviceMemory); mDeviceMemory:%p", (void *) mDeviceMemory);
+            // LOG_D("mDevice.free(mDeviceMemory); mDeviceMemory:%p", (void *) mDeviceMemory);
             mDevice.free(mDeviceMemory);
             mDevice = nullptr;
             mDeviceMemory = nullptr;

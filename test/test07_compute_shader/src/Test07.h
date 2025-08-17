@@ -17,9 +17,18 @@
 #include "vklite/vklite_windows.h"
 #include "vklite/Log.h"
 
-
 namespace test {
-    class Test06 : public TestBase {
+    struct UniformBufferObject {
+        float deltaTime = 1.0f;
+    };
+
+    struct Particle {
+        glm::vec2 position;
+        glm::vec2 velocity;
+        glm::vec4 color;
+    };
+
+    class Test07 : public TestBase {
     private:
         // config
         uint32_t mFrameCount = 2;
@@ -41,8 +50,10 @@ namespace test {
         std::unique_ptr<vklite::Surface> mSurface;
         std::unique_ptr<vklite::PhysicalDevice> mPhysicalDevice;
         std::unique_ptr<vklite::Device> mDevice;
+
         std::unique_ptr<vklite::Queue> mGraphicQueue;
         std::unique_ptr<vklite::Queue> mPresentQueue;
+
 
         std::unique_ptr<vklite::Swapchain> mSwapchain;
         std::vector<vklite::ImageView> mDisplayImageViews;
@@ -53,22 +64,28 @@ namespace test {
         std::unique_ptr<vklite::RenderPass> mRenderPass;
         vklite::Framebuffers mFramebuffers;
 
+
         std::unique_ptr<vklite::CommandPool> mCommandPool;
-        std::unique_ptr<vklite::CommandBuffers> mCommandBuffers;
-
-        std::vector<vklite::Semaphore> mImageAvailableSemaphores;
-        std::vector<vklite::Semaphore> mRenderFinishedSemaphores;
-        std::vector<vklite::Fence> mFences;
-
-        std::unique_ptr<vklite::PipelineLayout> mPipelineLayout;
         std::unique_ptr<vklite::DescriptorPool> mDescriptorPool;
-        std::unique_ptr<vklite::DescriptorSetLayouts> mDescriptorSetLayouts;
-        std::vector<std::vector<vk::DescriptorSet> > mDescriptorSets;
-        std::vector<vklite::PushConstant> mPushConstants;
-        std::unique_ptr<vklite::Pipeline> mPipeline;
+
+
+        std::unique_ptr<vklite::CommandBuffers> mGraphicCommandBuffers;
+        std::vector<vklite::Semaphore> mGraphicImageAvailableSemaphores;
+        std::vector<vklite::Semaphore> mGraphicRenderFinishedSemaphores;
+        std::vector<vklite::Fence> mGraphicFences;
+
+        std::unique_ptr<vklite::CombinedPipeline> mGraphicPipeline;
+
+
+        std::unique_ptr<vklite::Queue> mComputeQueue;
+        std::unique_ptr<vklite::CommandBuffers> mComputeCommandBuffers;
+        std::vector<vklite::Fence> mComputeFences;
+        std::vector<vklite::Semaphore> mComputeFinishSemaphores;
+
+        std::unique_ptr<vklite::CombinedPipeline> mComputePipeline;
 
         // vertex buffer
-        std::vector<vk::Buffer> mVertexBuffers;
+        std::vector<vk::Buffer> mVertexVkBuffers;
         std::vector<vk::DeviceSize> mVertexBufferOffsets;
 
         // index buffer
@@ -76,20 +93,18 @@ namespace test {
         uint32_t mIndexBufferOffset = 0;
         uint32_t mIndexCount = 0;
 
+
         // resource
-        std::unique_ptr<vklite::IndexBuffer> mIndexBuffer;
-        std::unique_ptr<vklite::VertexBuffer> mVertexBuffer;
-
-        math::MvpMatrix mMvpMatrix{};
+        static constexpr uint32_t mParticleCount = 8192;
+        //status
         util::Timer mTimer;
-
-        std::vector<vklite::CombinedImageSampler> mSamplers;
+        std::vector<vklite::StorageBuffer> mShaderStorageBuffers;
         std::vector<vklite::UniformBuffer> mUniformBuffers;
 
     public:
-        Test06();
+        Test07();
 
-        ~Test06() override;
+        ~Test07() override;
 
         void init(GLFWwindow* window, int32_t width, int32_t height) override;
 
