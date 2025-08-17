@@ -19,5 +19,5 @@ target_link_libraries(${CURRENT_TEST_NAME}
         PRIVATE vklite sandbox math util
 )
 
-include("../../cmake/compile_copy_shader.cmake")
-compile_copy_shader(${CURRENT_TEST_NAME} "shader" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/shader")
+include("../../cmake/util/shader.cmake")
+compileShaderToTargetDir(${CURRENT_TEST_NAME} "shader" "shader")

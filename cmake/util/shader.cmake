@@ -1,4 +1,4 @@
-function(compile_copy_shader target_name shader_input_dir shader_output_dir)
+function(compileShaderToDir target_name shader_input_dir shader_output_dir)
     message("compile_copy_shader: target_name:${target_name}, shader_input_dir:${shader_input_dir}, shader_output_dir:${shader_output_dir}")
     # 1. 定义着色器类型扩展名列表
     set(SHADER_TYPES "*.frag" "*.vert" "*.comp" "*.geom" "*.tesc" "*.tese" "*.rgen" "*.rchit" "*.rmiss" "*.mesh" "*.task")
@@ -32,4 +32,10 @@ function(compile_copy_shader target_name shader_input_dir shader_output_dir)
         )
     endforeach ()
 
+endfunction()
+
+function(compileShaderToTargetDir target_name src_dir target_dst_dir)
+    message("compileShaderToTargetDir: target_name:${target_name}, src_dir:${shader_input_dir}, dst_dir:${shader_output_dir}")
+    set(dst_dir $<TARGET_FILE_DIR:${target_name}>/${target_dst_dir})
+    compileShaderToDir(${target_name} ${src_dir} ${dst_dir})
 endfunction()

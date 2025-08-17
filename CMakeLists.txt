@@ -50,22 +50,22 @@ set(glm_install_dir "D:/develop/opengl/glm/glm-1.0.1-light" CACHE STRING "glm in
 # https://github.com/tinyobjloader/tinyobjloader
 set(tinyobjloader_install_dir "D:/develop/opengl/tinyobjloader" CACHE STRING "tinyobjloader install dir")
 
-include(cmake/import_vulkan.cmake)
+include(cmake/import/import_vulkan.cmake)
 import_vulkan(${vulkan_install_dir})
 
-include(cmake/import_vulkan_headers.cmake)
+include(cmake/import/import_vulkan_headers.cmake)
 import_vulkan_headers(${vulkan_headers_install_dir})
 
-include(cmake/import_glm.cmake)
+include(cmake/import/import_glm.cmake)
 import_glm(${glm_install_dir})
 
-include(cmake/import_glfw.cmake)
+include(cmake/import/import_glfw.cmake)
 import_glfw(${glfw_install_dir})
 
-include(cmake/import_stb.cmake)
+include(cmake/import/import_stb.cmake)
 import_stb(${stb_install_dir})
 
-include(cmake/import_tinyobjloader.cmake)
+include(cmake/import/import_tinyobjloader.cmake)
 import_tinyobjloader(${tinyobjloader_install_dir})
 
 

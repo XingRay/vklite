@@ -20,18 +20,8 @@ target_link_libraries(${CURRENT_TEST_NAME}
 )
 
 
-include("../../cmake/compile_copy_shader.cmake")
-compile_copy_shader(${CURRENT_TEST_NAME} "shader" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/shader")
+include("../../cmake/util/shader.cmake")
+compileShaderToTargetDir(${CURRENT_TEST_NAME} "shader" "shader")
 
-include("../../cmake/utils.cmake")
-copyDirToTargetDir(${CURRENT_TEST_NAME} "resource" "resource")
-
-#set(TEST_IMAGES "resource/image/01.jpg")
-#foreach (IMAGE_FILE ${TEST_IMAGES})
-#    get_filename_component(IMAGE_FILE_NAME ${IMAGE_FILE} NAME)
-#    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-#            COMMAND ${CMAKE_COMMAND} -E copy
-#            "${IMAGE_FILE}"
-#            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/image/${IMAGE_FILE_NAME}"
-#    )
-#endforeach ()
+include("../../cmake/util/file.cmake")
+copySourceDirToTargetDir(${CURRENT_TEST_NAME} "resource" "resource")

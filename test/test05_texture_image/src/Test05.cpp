@@ -19,8 +19,8 @@ namespace test {
     Test05::~Test05() = default;
 
     void Test05::init(GLFWwindow* window, int32_t width, int32_t height) {
-        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("spv/05_texture_image.vert.spv");
-        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("spv/05_texture_image.frag.spv");
+        std::vector<uint32_t> vertexShaderCode = util::FileUtil::loadSpvFile("shader/05_texture_image.vert.spv");
+        std::vector<uint32_t> fragmentShaderCode = util::FileUtil::loadSpvFile("shader/05_texture_image.frag.spv");
 
         vklite::ShaderConfigure shaderConfigure = vklite::ShaderConfigure()
                 .vertexShaderCode(std::move(vertexShaderCode))
@@ -374,6 +374,10 @@ namespace test {
     }
 
     void Test05::cleanup() {
+        vk::Device device = (*mDevice).getVkDevice();
+        if (device != nullptr) {
+            device.waitIdle();
+        }
     }
 
     void Test05::onWindowResized(int32_t width, int32_t height) {
