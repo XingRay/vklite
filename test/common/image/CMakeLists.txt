@@ -5,7 +5,7 @@ file(GLOB_RECURSE IMAGE_SRC_LIST
 add_library(image ${IMAGE_SRC_LIST})
 
 target_include_directories(image
-        PUBLIC .
+        PUBLIC ..
 )
 
 target_link_libraries(image

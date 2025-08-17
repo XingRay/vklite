@@ -5,7 +5,7 @@ file(GLOB_RECURSE MODEL_SRC_LIST
 add_library(model ${MODEL_SRC_LIST})
 
 target_include_directories(model
-        PUBLIC .
+        PUBLIC ..
 )
 
 target_link_libraries(model

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "glm.h"
+#include "math/glm.h"
 
 namespace model {
 

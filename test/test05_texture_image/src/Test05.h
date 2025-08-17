@@ -9,8 +9,8 @@
 #include <cstdint>
 
 #include "sandbox/TestBase.h"
-#include "glm.h"
-#include "Timer.h"
+#include "math/glm.h"
+#include "util/Timer.h"
 
 #include "vklite/vklite.h"
 #include "vklite/vklite_windows.h"

@@ -9,7 +9,7 @@
 #include <cstdint>
 
 #include "sandbox/TestBase.h"
-#include "glm.h"
+#include "math/glm.h"
 
 #include "vklite/vklite.h"
 #include "vklite/vklite_windows.h"

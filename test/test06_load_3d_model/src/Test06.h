@@ -10,22 +10,27 @@
 
 #include "sandbox/TestBase.h"
 #include "math/glm.h"
+#include "math/MvpMatrix.h"
+#include "util/Timer.h"
 
 #include "vklite/vklite.h"
 #include "vklite/vklite_windows.h"
+#include "vklite/Log.h"
 
 
 namespace test {
-    struct Vertex {
-        glm::vec3 pos;
-    };
-
-    class Test01 : public TestBase {
+    class Test06 : public TestBase {
     private:
         // config
         uint32_t mFrameCount = 2;
         std::array<float, 4> mClearColor = {0.2f, 0.4f, 0.8f, 1.0f};
+        //msaa
+        bool mMsaaEnable = false;
         vk::SampleCountFlagBits mSampleCount = vk::SampleCountFlagBits::e1;
+        //depth
+        bool mDepthTestEnable = true;
+        float mClearDepth = 1.0f;
+
 
         //status
         uint32_t mCurrentFrameIndex = 0;
@@ -43,6 +48,8 @@ namespace test {
 
         std::unique_ptr<vklite::Swapchain> mSwapchain;
         std::vector<vklite::ImageView> mDisplayImageViews;
+        std::unique_ptr<vklite::CombinedImageView> mColorImageView;
+        std::unique_ptr<vklite::CombinedImageView> mDepthImageView;
         std::vector<vk::Viewport> mViewports;
         std::vector<vk::Rect2D> mScissors;
 
@@ -57,6 +64,10 @@ namespace test {
         std::vector<vklite::Fence> mFences;
 
         std::unique_ptr<vklite::PipelineLayout> mPipelineLayout;
+        std::unique_ptr<vklite::DescriptorPool> mDescriptorPool;
+        std::unique_ptr<vklite::DescriptorSetLayouts> mDescriptorSetLayouts;
+        std::vector<std::vector<vk::DescriptorSet> > mDescriptorSets;
+        std::vector<vklite::PushConstant> mPushConstants;
         std::unique_ptr<vklite::Pipeline> mPipeline;
 
         // vertex buffer
@@ -72,10 +83,16 @@ namespace test {
         std::unique_ptr<vklite::IndexBuffer> mIndexBuffer;
         std::unique_ptr<vklite::VertexBuffer> mVertexBuffer;
 
-    public:
-        Test01();
+        math::MvpMatrix mMvpMatrix{};
+        util::Timer mTimer;
 
-        ~Test01() override;
+        std::vector<vklite::CombinedImageSampler> mSamplers;
+        std::vector<vklite::UniformBuffer> mUniformBuffers;
+
+    public:
+        Test06();
+
+        ~Test06() override;
 
         void init(GLFWwindow* window, int32_t width, int32_t height) override;
 

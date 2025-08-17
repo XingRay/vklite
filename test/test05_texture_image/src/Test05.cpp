@@ -3,13 +3,13 @@
 //
 
 #include "Test05.h"
-#include "FileUtil.h"
+#include "util/FileUtil.h"
 
 #include <numbers>
 #include <cmath>
 
-#include "ImageInterface.h"
-#include "StbImage.h"
+#include "image/ImageInterface.h"
+#include "image/StbImage.h"
 
 namespace test {
     Test05::Test05() {

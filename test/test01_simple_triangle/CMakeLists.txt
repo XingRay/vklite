@@ -4,7 +4,7 @@ message("PROJECT_NAME: ${PROJECT_NAME}")
 message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # 收集源代码
-file(GLOB_RECURSE TEST_SOURCES
+file(GLOB_RECURSE SRC_LIST
         "*.cpp"
         "*.c++"
         "*.c"
@@ -12,7 +12,7 @@ file(GLOB_RECURSE TEST_SOURCES
 )
 
 add_executable(${CURRENT_TEST_NAME}
-        ${TEST_SOURCES}
+        ${SRC_LIST}
 )
 
 target_link_libraries(${CURRENT_TEST_NAME}

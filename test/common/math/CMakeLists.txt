@@ -5,7 +5,7 @@ file(GLOB_RECURSE MATH_SRC_LIST
 add_library(math ${MATH_SRC_LIST})
 
 target_include_directories(math
-        PUBLIC .
+        PUBLIC ..
 )
 
 target_link_libraries(math

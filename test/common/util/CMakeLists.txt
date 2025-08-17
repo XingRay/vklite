@@ -10,5 +10,5 @@ add_library(util
 )
 
 target_include_directories(util
-        PUBLIC .
+        PUBLIC ..
 )

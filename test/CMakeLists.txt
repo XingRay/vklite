@@ -16,6 +16,9 @@ add_subdirectory(test04_mvp_matrix)
 set(CURRENT_TEST_NAME "test05_texture_image")
 add_subdirectory(test05_texture_image)
 
+set(CURRENT_TEST_NAME "test06_load_3d_model")
+add_subdirectory(test06_load_3d_model)
+
 ## 自动添加测试
 #file(GLOB dirs
 #        *

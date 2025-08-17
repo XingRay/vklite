@@ -4,7 +4,7 @@ message("PROJECT_NAME: ${PROJECT_NAME}")
 message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # 收集源代码
-file(GLOB_RECURSE TEST_SOURCES
+file(GLOB_RECURSE SRC_LIST
         "*.cpp"
         "*.c++"
         "*.c"
@@ -12,27 +12,15 @@ file(GLOB_RECURSE TEST_SOURCES
 )
 
 add_executable(${CURRENT_TEST_NAME}
-        ${TEST_SOURCES}
+        ${SRC_LIST}
 )
 
 target_link_libraries(${CURRENT_TEST_NAME}
-        PRIVATE vklite test_common math util image model
+        PRIVATE vklite sandbox math util image model
 )
 
-file(GLOB SPV_FILES
-        "${PROJECT_SOURCE_DIR}/test/spv/06_*.spv"
-)
-foreach (SPV_FILE ${SPV_FILES})
-    get_filename_component(SPV_FILE_NAME ${SPV_FILE} NAME)
-    add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${SPV_FILE}"
-            "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/spv/${SPV_FILE_NAME}"
-    )
-endforeach ()
+include("../../cmake/util/shader.cmake")
+compileShaderToTargetDir(${CURRENT_TEST_NAME} "shader" "shader")
 
-add_custom_command(TARGET ${CURRENT_TEST_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/test/resource/model"
-        "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/resource/model"
-)
+include("../../cmake/util/file.cmake")
+copySourceDirToTargetDir(${CURRENT_TEST_NAME} "resource" "resource")
