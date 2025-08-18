@@ -7,16 +7,16 @@
 #include "vklite/physical_device/filter/QueueSupportPhysicalDeviceFilter.h"
 
 namespace vklite {
-
     PhysicalDeviceSelector::PhysicalDeviceSelector() = default;
 
     PhysicalDeviceSelector::~PhysicalDeviceSelector() = default;
 
-    PhysicalDeviceSelector::PhysicalDeviceSelector(PhysicalDeviceSelector &&other) noexcept
-            : mScoreCalculator(std::move(other.mScoreCalculator)),
-              mPhysicalDeviceFilters(std::move(other.mPhysicalDeviceFilters)) {}
+    PhysicalDeviceSelector::PhysicalDeviceSelector(PhysicalDeviceSelector&& other) noexcept
+        : mScoreCalculator(std::move(other.mScoreCalculator)),
+          mPhysicalDeviceFilters(std::move(other.mPhysicalDeviceFilters)) {
+    }
 
-    PhysicalDeviceSelector &PhysicalDeviceSelector::operator=(PhysicalDeviceSelector &&other) noexcept {
+    PhysicalDeviceSelector& PhysicalDeviceSelector::operator=(PhysicalDeviceSelector&& other) noexcept {
         if (this != &other) {
             mScoreCalculator = std::move(other.mScoreCalculator);
             mPhysicalDeviceFilters = std::move(other.mPhysicalDeviceFilters);
@@ -24,28 +24,28 @@ namespace vklite {
         return *this;
     }
 
-    PhysicalDeviceSelector &PhysicalDeviceSelector::scoreCalculator(std::unique_ptr<PhysicalDeviceScoreCalculator> scoreCalculator) {
+    PhysicalDeviceSelector& PhysicalDeviceSelector::scoreCalculator(std::unique_ptr<PhysicalDeviceScoreCalculator> scoreCalculator) {
         mScoreCalculator = std::move(scoreCalculator);
         return *this;
     }
 
-    PhysicalDeviceSelector &PhysicalDeviceSelector::addPhysicalDeviceFilter(std::unique_ptr<PhysicalDeviceFilter> filter) {
+    PhysicalDeviceSelector& PhysicalDeviceSelector::addPhysicalDeviceFilter(std::unique_ptr<PhysicalDeviceFilter> filter) {
         mPhysicalDeviceFilters.push_back(std::move(filter));
         return *this;
     }
 
-    std::optional<PhysicalDevice *> PhysicalDeviceSelector::select(std::vector<PhysicalDevice> &physicalDevices) {
+    std::optional<PhysicalDevice*> PhysicalDeviceSelector::select(std::vector<PhysicalDevice>& physicalDevices) {
         if (physicalDevices.empty()) {
             LOG_D("PhysicalDeviceSelector::select: No physical devices found!");
             return std::nullopt;
         }
 
         uint32_t maxScore = 0;
-        PhysicalDevice *bestPhysicalDevice;
+        PhysicalDevice* bestPhysicalDevice = nullptr;
 
-        for (PhysicalDevice &physicalDevice: physicalDevices) {
+        for (PhysicalDevice& physicalDevice: physicalDevices) {
             bool filterPassed = true;
-            for (const std::unique_ptr<PhysicalDeviceFilter> &filter: mPhysicalDeviceFilters) {
+            for (const std::unique_ptr<PhysicalDeviceFilter>& filter: mPhysicalDeviceFilters) {
                 if (!filter->test(physicalDevice)) {
                     filterPassed = false;
                     break;
@@ -62,7 +62,7 @@ namespace vklite {
             }
         }
 
-        if (maxScore == 0) {
+        if (bestPhysicalDevice == nullptr) {
             LOG_E("PhysicalDeviceSelector::select: suitable PhysicalDevice not found !");
             throw std::runtime_error("PhysicalDeviceSelector::select: suitable PhysicalDevice not found !");
         }
@@ -70,20 +70,20 @@ namespace vklite {
         return bestPhysicalDevice;
     }
 
-    std::unique_ptr<PhysicalDevice> PhysicalDeviceSelector::selectUnique(const std::vector<vk::PhysicalDevice> &vkPhysicalDevices) {
+    std::unique_ptr<PhysicalDevice> PhysicalDeviceSelector::selectUnique(const std::vector<vk::PhysicalDevice>& vkPhysicalDevices) {
         std::vector<PhysicalDevice> physicalDevices;
         physicalDevices.reserve(physicalDevices.size());
-        for (const vk::PhysicalDevice &vkPhysicalDevice: vkPhysicalDevices) {
+        for (const vk::PhysicalDevice& vkPhysicalDevice: vkPhysicalDevices) {
             physicalDevices.emplace_back(vkPhysicalDevice);
         }
-        std::optional<PhysicalDevice *> selected = select(physicalDevices);
+        std::optional<PhysicalDevice*> selected = select(physicalDevices);
         if (!selected.has_value()) {
             return nullptr;
         }
         return std::make_unique<PhysicalDevice>(std::move(*(selected.value())));
     }
 
-    std::optional<vk::PhysicalDevice> PhysicalDeviceSelector::select(const std::vector<vk::PhysicalDevice> &physicalDevices) {
+    std::optional<vk::PhysicalDevice> PhysicalDeviceSelector::select(const std::vector<vk::PhysicalDevice>& physicalDevices) {
         std::unique_ptr<PhysicalDevice> physicalDevice = selectUnique(physicalDevices);
         if (physicalDevice == nullptr) {
             return std::nullopt;
@@ -91,20 +91,30 @@ namespace vklite {
         return physicalDevice->getVkPhysicalDevice();
     }
 
-
-    PhysicalDeviceSelector PhysicalDeviceSelector::makeDefault(const Surface &surface, vk::QueueFlags queueFlags) {
-        PhysicalDeviceSelector deviceSelector = PhysicalDeviceSelector();
-
+    PhysicalDeviceSelector& PhysicalDeviceSelector::asDefault() {
         // set score calculator
-        deviceSelector.scoreCalculator(std::make_unique<PhysicalDeviceScoreCalculator>());
+        (*this).scoreCalculator(std::make_unique<PhysicalDeviceScoreCalculator>());
+        return *this;
+    }
 
+    PhysicalDeviceSelector& PhysicalDeviceSelector::supportSurface(const Surface& surface) {
         // surface support required
-        deviceSelector.addPhysicalDeviceFilter(std::make_unique<SurfaceSupportPhysicalDeviceFilter>(surface));
+        (*this).addPhysicalDeviceFilter(std::make_unique<SurfaceSupportPhysicalDeviceFilter>(surface));
+        return *this;
+    }
 
+    PhysicalDeviceSelector& PhysicalDeviceSelector::supportQueueFlags(vk::QueueFlags queueFlags) {
         // queue flags support required
-        deviceSelector.addPhysicalDeviceFilter(std::make_unique<QueueSupportPhysicalDeviceFilter>(queueFlags));
+        (*this).addPhysicalDeviceFilter(std::make_unique<QueueSupportPhysicalDeviceFilter>(queueFlags));
+        return *this;
+    }
+
+    PhysicalDeviceSelector PhysicalDeviceSelector::makeDefault(const Surface& surface, vk::QueueFlags queueFlags) {
+        PhysicalDeviceSelector deviceSelector = PhysicalDeviceSelector();
+        deviceSelector.asDefault()
+                .supportSurface(surface)
+                .supportQueueFlags(queueFlags);
 
         return std::move(deviceSelector);
     }
-
 } // vklite

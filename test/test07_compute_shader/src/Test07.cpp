@@ -76,7 +76,10 @@ namespace test {
                 .window(window)
                 .buildUnique();
 
-        mPhysicalDevice = vklite::PhysicalDeviceSelector::makeDefault(*mSurface, vk::QueueFlagBits::eGraphics)
+        mPhysicalDevice = vklite::PhysicalDeviceSelector()
+                .asDefault()
+                .supportSurface(*mSurface)
+                .supportQueueFlags(vk::QueueFlagBits::eGraphics)
                 .selectUnique((*mInstance).enumeratePhysicalDevices());
 
         uint32_t presentQueueFamilyIndex = (*mPhysicalDevice).queryQueueFamilyIndicesBySurface((*mSurface).getVkSurface())[0];
