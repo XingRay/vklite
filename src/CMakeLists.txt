@@ -14,7 +14,6 @@ target_include_directories(vklite
 
 if (WIN32)
     message("build for windows")
-    include(${PROJECT_SOURCE_DIR}/cmake/vklite-windows.cmake)
 
     target_link_libraries(vklite
             PUBLIC vulkan glfw
@@ -26,8 +25,6 @@ if (WIN32)
 
 elseif (ANDROID)
     message("build for android")
-
-    include(${PROJECT_SOURCE_DIR}/cmake/vklite-android.cmake)
 
     target_link_libraries(vklite
             PUBLIC
@@ -80,6 +77,12 @@ install(EXPORT vkliteModule
         DESTINATION "vklite/lib/cmake"
 )
 
+# vkliteConfig.cmake 中需要使用的参数, 记录库的实际构建类型（固化到配置文件中）
+if (BUILD_SHARED_LIBS)
+    set(vklite_BUILD_TYPE "SHARED")
+else ()
+    set(vklite_BUILD_TYPE "STATIC")
+endif ()
 configure_file(
         ${PROJECT_SOURCE_DIR}/cmake/vkliteConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/cmake/vkliteConfig.cmake
