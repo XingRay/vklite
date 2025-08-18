@@ -51,4 +51,15 @@ namespace vklite {
         return wait(std::numeric_limits<uint64_t>::max());
     }
 
+    vk::Result Fence::waitAndReset(uint64_t timeout) {
+        vk::Result result = wait(timeout);
+        if (result != vk::Result::eSuccess) {
+            return result;
+        }
+        return reset();
+    }
+
+    vk::Result Fence::waitAndReset() {
+        return waitAndReset(std::numeric_limits<uint64_t>::max());
+    }
 } // vklite

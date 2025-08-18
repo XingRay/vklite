@@ -306,21 +306,20 @@ namespace test {
 
     void Test07::drawFrame() {
         UniformBufferObject ubo{};
-        ubo.deltaTime = mTimer.getDeltaTimeMs() * 2.0f;
+        ubo.deltaTime = static_cast<float>(mTimer.getDeltaTimeMs()) * 2.0f;
         // LOG_D("ubo.deltaTime: %f", ubo.deltaTime);
         mUniformBuffers[mCurrentFrameIndex].update(*mCommandPool, &ubo, sizeof(UniformBufferObject));
 
+        vk::Result result;
 
         // compute pipeline
-        vk::Result result = mComputeFences[mCurrentFrameIndex].wait();
-        if (result != vk::Result::eSuccess) {
-            LOG_E("waitForFences failed");
-            throw std::runtime_error("waitForFences failed");
-        }
+        vklite::Fence& computeFence = mComputeFences[mCurrentFrameIndex];
+        vklite::Semaphore& computeFinishSemaphore = mComputeFinishSemaphores[mCurrentFrameIndex];
 
-        result = mComputeFences[mCurrentFrameIndex].reset();
+        result = computeFence.waitAndReset();
         if (result != vk::Result::eSuccess) {
-            throw std::runtime_error("mComputeFences[mCurrentFrameIndex] resetFences failed");
+            LOG_E("computeFence.waitAndReset() failed");
+            throw std::runtime_error("computeFence.waitAndReset() failed");
         }
 
         const vklite::PooledCommandBuffer& computeCommandBuffer = (*mComputeCommandBuffers)[mCurrentFrameIndex];
@@ -332,24 +331,18 @@ namespace test {
         });
 
         mComputeQueue->submit(computeCommandBuffer.getVkCommandBuffer(),
-                              mComputeFinishSemaphores[mCurrentFrameIndex].getVkSemaphore(),
-                              mComputeFences[mCurrentFrameIndex].getVkFence());
-
-        result = mComputeFences[mCurrentFrameIndex].wait();
-        if (result != vk::Result::eSuccess) {
-            LOG_E("waitForFences failed");
-            throw std::runtime_error("waitForFences failed");
-        }
+                              computeFinishSemaphore.getVkSemaphore(),
+                              computeFence.getVkFence());
 
 
         vklite::Semaphore& imageAvailableSemaphore = mGraphicImageAvailableSemaphores[mCurrentFrameIndex];
         vklite::Semaphore& renderFinishedSemaphore = mGraphicRenderFinishedSemaphores[mCurrentFrameIndex];
-        vklite::Fence& fence = mGraphicFences[mCurrentFrameIndex];
+        vklite::Fence& graphicFence = mGraphicFences[mCurrentFrameIndex];
 
-        result = mGraphicFences[mCurrentFrameIndex].wait();
+        result = graphicFence.waitAndReset();
         if (result != vk::Result::eSuccess) {
-            LOG_E("waitForFences failed");
-            throw std::runtime_error("waitForFences failed");
+            LOG_E("graphicFence.waitAndReset() failed");
+            throw std::runtime_error("graphicFence.waitAndReset() failed");
         }
 
         // 当 acquireNextImageKHR 成功返回时，imageAvailableSemaphore 会被触发，表示图像已经准备好，可以用于渲染。
@@ -393,16 +386,11 @@ namespace test {
             });
         });
 
-        result = mGraphicFences[mCurrentFrameIndex].reset();
-        if (result != vk::Result::eSuccess) {
-            throw std::runtime_error("resetFences failed");
-        }
-
         mGraphicQueue->submit(commandBuffer.getVkCommandBuffer(),
-                              vk::PipelineStageFlagBits::eColorAttachmentOutput,
-                              imageAvailableSemaphore.getVkSemaphore(),
+                              std::vector<vk::PipelineStageFlags>{vk::PipelineStageFlagBits::eColorAttachmentOutput, vk::PipelineStageFlagBits::eComputeShader},
+                              std::vector<vk::Semaphore>{imageAvailableSemaphore.getVkSemaphore(), computeFinishSemaphore.getVkSemaphore()},
                               renderFinishedSemaphore.getVkSemaphore(),
-                              fence.getVkFence());
+                              graphicFence.getVkFence());
 
         result = mPresentQueue->present(mSwapchain->getVkSwapChain(), imageIndex, renderFinishedSemaphore.getVkSemaphore());
         if (result != vk::Result::eSuccess) {

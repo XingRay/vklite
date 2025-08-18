@@ -67,11 +67,34 @@ namespace vklite {
         mQueue.submit(submitInfos, fence);
     }
 
-    void Queue::submit(const vk::CommandBuffer& commandBuffer, vk::PipelineStageFlags waitStage, const vk::Semaphore& waitSemaphore,
-                       const vk::Semaphore& signalSemaphore, const vk::Fence& fence) const {
+    void Queue::submit(const vk::CommandBuffer& commandBuffer,
+                       vk::PipelineStageFlags waitStage,
+                       const vk::Semaphore& waitSemaphore,
+                       const vk::Semaphore& signalSemaphore,
+                       const vk::Fence& fence) const {
         std::array<vk::CommandBuffer, 1> commandBuffers = {commandBuffer};
         std::array<vk::PipelineStageFlags, 1> waitStages = {waitStage};
         std::array<vk::Semaphore, 1> waitSemaphores = {waitSemaphore};
+        std::array<vk::Semaphore, 1> signalSemaphores = {signalSemaphore};
+
+        vk::SubmitInfo submitInfo{};
+        submitInfo
+                .setWaitSemaphores(waitSemaphores)
+                .setWaitDstStageMask(waitStages)
+                .setCommandBuffers(commandBuffers)
+                .setSignalSemaphores(signalSemaphores);
+
+        std::array<vk::SubmitInfo, 1> submitInfos = {submitInfo};
+
+        mQueue.submit(submitInfos, fence);
+    }
+
+    void Queue::submit(const vk::CommandBuffer& commandBuffer,
+                       const std::vector<vk::PipelineStageFlags>& waitStages,
+                       const std::vector<vk::Semaphore>& waitSemaphores,
+                       const vk::Semaphore& signalSemaphore,
+                       const vk::Fence& fence) const {
+        std::array<vk::CommandBuffer, 1> commandBuffers = {commandBuffer};
         std::array<vk::Semaphore, 1> signalSemaphores = {signalSemaphore};
 
         vk::SubmitInfo submitInfo{};
