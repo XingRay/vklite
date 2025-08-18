@@ -1,5 +1,5 @@
 # ======================================================
-#  Vklite CMake 配置文件
+#  vklite CMake 配置文件
 # ======================================================
 
 # ======================================================
@@ -20,7 +20,7 @@ get_filename_component(vklite_INSTALL_PATH "${vklite_INSTALL_PATH}" PATH)
 # vklite_BUILD_TYPE = BUILD_SHARED_LIBS ? "SHARED" : "STATIC"
 set(vklite_BUILD_TYPE "@vklite_BUILD_TYPE@")
 
-# 搜索头文件, 添加至全局变量 Vklite_INCLUDE_DIRS
+# 搜索头文件, 添加至全局变量 vklite_INCLUDE_DIRS
 # xxx/dist/vklite/cmake/include
 set(VKLITE_INCLUDE_COMPONENTS "${vklite_INSTALL_PATH}/include")
 set(vklite_INCLUDE_DIRS "")
@@ -31,7 +31,7 @@ foreach (include_component ${VKLITE_INCLUDE_COMPONENTS})
 
     if (NOT EXISTS "${include_component_real_path}")
         # 目录不存在,则报警告
-        message(WARNING "Vklite: Include directory doesn't exist: '${include_component}'. installation may be broken. Skip...")
+        message(WARNING "vklite: Include directory doesn't exist: '${include_component}'. installation may be broken. Skip...")
     else ()
         # 添加到全局属性中
         list(APPEND vklite_INCLUDE_DIRS "${include_component_real_path}")
@@ -58,13 +58,13 @@ endforeach ()
 # ======================================================
 include(FindPackageHandleStandardArgs)
 message("vklite_INSTALL_PATH:${vklite_INSTALL_PATH}")
-message("vklite_INCLUDE_DIRS:${Vklite_INCLUDE_DIRS}")
-message("vklite_LIBS:${Vklite_LIBS}")
+message("vklite_INCLUDE_DIRS:${vklite_INCLUDE_DIRS}")
+message("vklite_LIBS:${vklite_LIBS}")
 find_package_handle_standard_args(
-        Vklite
+        vklite
         # 注意这里要传入变量的名称 "vklite_INSTALL_PATH" 而不是变量的值,
         # 如 ${vklite_INSTALL_PATH} 或者 "path/to/include" 都是错误的
 
         REQUIRED_VARS vklite_INSTALL_PATH vklite_INCLUDE_DIRS vklite_LIBS
 )
-message("Vklite_FOUND:${Vklite_FOUND}")
+message("vklite_FOUND:${vklite_FOUND}")
